@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Authors>Camilo Terevinto</Authors>
+		<PackageTags>asp.net core;static website</PackageTags>
+		<PackageProjectUrl>https://github.com/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator</RepositoryUrl>
+		<Description>
+			A package for creating Static Websites (HTML+CSS+JavaScript) from ASP.NET Core MVC views.
+			Read the README in the GitHub project for information on usage.
+		</Description>
+		<PackageReleaseNotes>
+			[0.0.1]: First release
+		</PackageReleaseNotes>
+		<Version>0.0.1</Version>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
+	</ItemGroup>
+
+</Project>
