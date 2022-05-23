@@ -12,18 +12,13 @@ This project is divided in two packages:
 
 | Package | Purpose |
 | ------- | ------- |
-| [TerevintoSoftware.StaticSiteGenerator][1] | Contains main logic, depends on ASP.NET Core. |
-| [TerevintoSoftware.StaticSiteGenerator.Tool][2] | Contains interfaces used by the main package. |
-
-### 1. `TerevintoSoftware.StaticSiteGenerator`
-
-
-### 2. `TerevintoSoftware.StaticSiteGenerator.Tool`
-
+| [TerevintoSoftware.StaticSiteGenerator][1] | Contains the main logic of the project, depends on ASP.NET Core. |
+| [TerevintoSoftware.StaticSiteGenerator.Tool][2] | Contains a .NET Tool that can be invoked to perform the generation. |
 
 ## Sample usage
 
-
+1. Install the tool: `dotnet tool install TerevintoSoftware.StaticSiteGenerator.Tool`
+2. Run the static site generation: `ssg --project-path [project-path] --output-path [output-path] --assembly-path [assembly-path]`
 
 ## How to build
 
