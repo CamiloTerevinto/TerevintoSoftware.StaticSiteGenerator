@@ -2,5 +2,5 @@
 
 internal interface IViewCompilerService
 {
-    IAsyncEnumerable<(string, string)> GenerateHtml(IEnumerable<string> viewsToRender);
+    Task<IEnumerable<ViewGenerationResult>> CompileViews(IEnumerable<string> viewsToRender);
 }

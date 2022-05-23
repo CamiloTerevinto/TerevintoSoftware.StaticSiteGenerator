@@ -15,9 +15,9 @@
 			Read the README in the GitHub project for information on usage.
 		</Description>
 		<PackageReleaseNotes>
-			[0.0.1]: First release
+			[0.1.0]: First usable release
 		</PackageReleaseNotes>
-		<Version>0.0.1</Version>
+		<Version>0.1.0</Version>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
@@ -34,6 +34,7 @@
 
 	<ItemGroup>
 	  <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
+	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.5" />
 	</ItemGroup>
 
 </Project>

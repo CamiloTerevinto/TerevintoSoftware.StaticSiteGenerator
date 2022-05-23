@@ -14,9 +14,9 @@
 			Read the README in the GitHub project for information on usage.
 		</Description>
 		<PackageReleaseNotes>
-			[0.0.1]: First release
+			[0.1.0]: First usable release
 		</PackageReleaseNotes>
-		<Version>0.0.2</Version>
+		<Version>0.1.0</Version>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackAsTool>true</PackAsTool>
 		<ToolCommandName>ssg</ToolCommandName>
@@ -28,6 +28,10 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
 	</ItemGroup>
 
 	<ItemGroup>

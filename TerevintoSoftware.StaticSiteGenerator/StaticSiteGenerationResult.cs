@@ -8,18 +8,19 @@ public class StaticSiteGenerationResult
     /// <summary>
     /// Gets the list of views that were compiled into HTML.
     /// </summary>
-    public IReadOnlyCollection<string> ViewsCompiled { get; init; }
+    public IReadOnlyCollection<string> ViewsCompiled { get; }
 
     /// <summary>
     /// Gets the list of non-fatal errors that occurred during the generation.
     /// </summary>
-    public IReadOnlyList<string> Errors { get; }
+    public IReadOnlyCollection<string> Errors { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StaticSiteGenerationResult"/> class.
     /// </summary>
-    public StaticSiteGenerationResult()
+    public StaticSiteGenerationResult(IReadOnlyCollection<string> views, IReadOnlyCollection<string> errors)
     {
-        Errors = new List<string>();
+        ViewsCompiled = views;
+        Errors = errors;
     }
 }

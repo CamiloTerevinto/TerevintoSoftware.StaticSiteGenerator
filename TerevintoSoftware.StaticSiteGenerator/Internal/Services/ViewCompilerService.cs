@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using System.Collections.Concurrent;
 using System.Text;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Internal.Services;
@@ -17,14 +19,35 @@ internal class ViewCompilerService : IViewCompilerService
     private readonly ITempDataProvider _tempDataProvider;
     private readonly IServiceProvider _serviceProvider;
 
-    public ViewCompilerService(MvcViewOptions viewOptions, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
+    public ViewCompilerService(IOptions<MvcViewOptions> viewOptions, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
     {
-        _viewOptions = viewOptions;
+        _viewOptions = viewOptions.Value;
         _tempDataProvider = tempDataProvider;
         _serviceProvider = serviceProvider;
     }
 
-    public async IAsyncEnumerable<(string, string)> GenerateHtml(IEnumerable<string> viewsToRender)
+    public async Task<IEnumerable<ViewGenerationResult>> CompileViews(IEnumerable<string> viewsToRender)
+    {
+        var bag = new ConcurrentBag<ViewGenerationResult>();
+        
+        await Parallel.ForEachAsync(viewsToRender, async (viewName, ct) =>
+        {
+            try
+            {
+                var html = await GetCompiledView(viewName);
+
+                bag.Add(new ViewGenerationResult(viewName, new GeneratedView(viewName + ".html", html)));
+            }
+            catch (Exception ex)
+            {
+                bag.Add(new ViewGenerationResult(viewName, ex.Message));
+            }
+        });
+
+        return bag.ToArray();
+    }
+
+    private async Task<string> GetCompiledView(string viewName)
     {
         using var scope = _serviceProvider.CreateScope();
 
@@ -39,22 +62,13 @@ internal class ViewCompilerService : IViewCompilerService
         var actionContext = new ActionContext(context, routeData, new ControllerActionDescriptor());
         var viewEngine = _viewOptions.ViewEngines.First();
         var htmlHelperOptions = _viewOptions.HtmlHelperOptions;
+        
+        var view = viewEngine.FindView(actionContext, viewName, true).View;
 
-        foreach (var viewName in viewsToRender)
+        if (view == null)
         {
-            //var paths = view.Split('/');
-            //paths = paths.Take(paths.Length - 2).ToArray();
-            //var folderPath = Path.Join(paths);
-
-            //var filePath = Path.Join(folderPath, paths[^-1] + ".html");
-            
-            yield return (viewName + ".html", await GetCompiledView(actionContext, viewEngine, htmlHelperOptions, viewName));
+            throw new InvalidOperationException($"Unable to find view '{viewName}'");
         }
-    }
-
-    private async Task<string> GetCompiledView(ActionContext actionContext, IViewEngine viewEngine, HtmlHelperOptions htmlHelperOptions, string viewName)
-    {
-        var view = viewEngine.FindView(actionContext, viewName, true).View!;
 
         var builder = new StringBuilder();
 
