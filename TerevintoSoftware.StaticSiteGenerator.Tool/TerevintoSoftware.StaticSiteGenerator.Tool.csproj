@@ -9,18 +9,16 @@
 		<PackageTags>asp.net core;static website</PackageTags>
 		<PackageProjectUrl>https://github.com/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator</RepositoryUrl>
-		<Description>
-			A package for creating Static Websites (HTML+CSS+JavaScript) from ASP.NET Core MVC views.
-			Read the README in the GitHub project for information on usage.
-		</Description>
-		<PackageReleaseNotes>
-			[0.1.0]: First usable release
-		</PackageReleaseNotes>
-		<Version>0.1.0</Version>
+		<Description>A package for creating Static Websites (HTML+CSS+JavaScript) from ASP.NET Core MVC views.
+Read the README in the GitHub project for information on usage.		</Description>
+		<PackageReleaseNotes>[0.2.0]: Add services to allow for relative URLs in views
+[0.1.0]: First usable release	</PackageReleaseNotes>
+		<Version>0.2.0</Version>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackAsTool>true</PackAsTool>
 		<ToolCommandName>ssg</ToolCommandName>
 		<PackageOutputPath>Packaged</PackageOutputPath>
+		<Copyright>Camilo Terevinto</Copyright>
 	</PropertyGroup>
 
 	<ItemGroup>

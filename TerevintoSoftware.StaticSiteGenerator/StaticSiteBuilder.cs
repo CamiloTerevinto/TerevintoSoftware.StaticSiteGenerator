@@ -1,4 +1,7 @@
-﻿namespace TerevintoSoftware.StaticSiteGenerator;
+﻿using Microsoft.Extensions.DependencyInjection;
+using TerevintoSoftware.StaticSiteGenerator.Internal;
+
+namespace TerevintoSoftware.StaticSiteGenerator;
 
 public static class StaticSiteBuilder
 {
@@ -9,9 +12,11 @@ public static class StaticSiteBuilder
             throw new ArgumentNullException(nameof(staticSiteOptions));
         }
 
-        var orchestrator = new Startup()
+        await using var app = new Startup()
             .ConfigureServices(staticSiteOptions)
-            .BuildServices();
+            .Build();
+
+        var orchestrator = app.Services.GetRequiredService<IOrchestrator>();
 
         return await orchestrator.BuildStaticFilesAsync();
     }

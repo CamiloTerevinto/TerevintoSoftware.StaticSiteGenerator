@@ -1,5 +1,8 @@
-﻿namespace TerevintoSoftware.StaticSiteGenerator.Internal;
+﻿using System.Diagnostics;
 
+namespace TerevintoSoftware.StaticSiteGenerator.Internal;
+
+[DebuggerDisplay("{DebuggerDisplay}")]
 internal class ViewGenerationResult
 {
     public string OriginalViewName { get; set; }
@@ -20,6 +23,8 @@ internal class ViewGenerationResult
         ErrorMessage = errorMessage;
         Failed = true;
     }
+
+    private string DebuggerDisplay => $"{OriginalViewName} => {(Failed ? "failed" : "generated")}";
 }
 
 internal class GeneratedView

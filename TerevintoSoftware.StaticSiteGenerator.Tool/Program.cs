@@ -43,8 +43,7 @@ public class Program
 
                 if (!Directory.Exists(outputPath))
                 {
-                    result.ErrorMessage = $"Output path '{outputPath}' does not exist";
-                    return null;
+                    Directory.CreateDirectory(outputPath);
                 }
 
                 return outputPath;
