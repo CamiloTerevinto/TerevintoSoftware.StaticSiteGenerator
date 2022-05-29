@@ -34,6 +34,7 @@ internal class ViewCompilerService : IViewCompilerService
     {
         var bag = new ConcurrentBag<ViewGenerationResult>();
 
+#if DEBUG
         foreach (var viewName in viewsToRender)
         {
             try
@@ -49,23 +50,24 @@ internal class ViewCompilerService : IViewCompilerService
                 bag.Add(new ViewGenerationResult(viewName, ex.Message));
             }
         }
+#else
+        await Parallel.ForEachAsync(viewsToRender, async (viewName, ct) =>
+        {
+            try
+            {
+                var html = await GetCompiledView(viewName);
 
-        //await Parallel.ForEachAsync(viewsToRender, async (viewName, ct) =>
-        //{
-        //    try
-        //    {
-        //        var html = await GetCompiledView(viewName);
+                html = FixRelativeLinks(viewName, html);
 
-        //        html = FixRelativeLinks(viewName, html);
-
-        //        bag.Add(new ViewGenerationResult(viewName, new GeneratedView(viewName + ".html", html)));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        bag.Add(new ViewGenerationResult(viewName, ex.Message));
-        //    }
-        //});
-
+                bag.Add(new ViewGenerationResult(viewName, new GeneratedView(viewName + ".html", html)));
+            }
+            catch (Exception ex)
+            {
+                bag.Add(new ViewGenerationResult(viewName, ex.Message));
+            }
+        });
+#endif
+        
         return bag.ToArray();
     }
 
