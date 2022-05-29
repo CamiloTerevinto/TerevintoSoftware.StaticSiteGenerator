@@ -32,7 +32,6 @@ internal class GeneratedView
     public string GeneratedName { get; set; }
     public string GeneratedHtml { get; set; }
 
-
     public GeneratedView(string generatedName, string generatedHtml)
     {
         GeneratedName = generatedName;

@@ -12,9 +12,10 @@
 		<RepositoryUrl>https://github.com/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator</RepositoryUrl>
 		<Description>A package for creating Static Websites (HTML+CSS+JavaScript) from ASP.NET Core MVC views.
 Read the README in the GitHub project for information on usage.  </Description>
-		<PackageReleaseNotes>[0.2.0]: Add services to allow for relative URLs in views
-[0.1.0]: First usable release </PackageReleaseNotes>
-		<Version>0.2.0</Version>
+		<PackageReleaseNotes>[1.0.0]: First major version. Improve CMD arguments, error handling and fix link generation.
+[0.2.0]: Add services to allow for relative URLs in views.
+[0.1.0]: First usable release.</PackageReleaseNotes>
+		<Version>1.0.0</Version>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<Copyright>Camilo Terevinto</Copyright>
 	</PropertyGroup>

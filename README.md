@@ -4,7 +4,7 @@ This project aims to provide a way for c# developers to benefit from very cheap/
 while allowing them to use familiar ASP.NET MVC concepts (Views, Partials, Layouts, etc).
 This also allows you to have an initial static site that you can then update to a dynamic website backed by ASP.NET Core without starting from scratch.
 
-Since this project converts Views into HTML files, it is not possible to use Models.
+Since this project converts Views into HTML files, it is not possible (at least yet) to use Models.
 
 ## Packages
 
@@ -18,11 +18,13 @@ This project is divided in two packages:
 ## Sample usage
 
 1. Install the tool: `dotnet tool install TerevintoSoftware.StaticSiteGenerator.Tool`
-2. Run the static site generation: `ssg --project-path [project-path] --output-path [output-path] --assembly-path [assembly-path]`
+2. (optional) Create a new project: `dotnet new mvc -o MyProject`
+3. (optional) See the available options with `ssg -h`
+4. Run the static site generation: `ssg --project [project-path] --output [output-path]`
 
 ## How to build
 
-* Install Visual Studio 2022 (.NET 6 required), if needed.
+* Install Visual Studio 2022 (.NET 6 required), if needed. The ASP.NET Core workload is required to build the project.
 * Install git, if needed.
 * Clone this repository.
 * Build from Visual Studio or through `dotnet build`.

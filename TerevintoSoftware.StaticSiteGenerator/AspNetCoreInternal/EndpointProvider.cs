@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 namespace TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
@@ -33,14 +34,25 @@ internal class EndpointProvider : IEndpointProvider, IAsyncDisposable
         // from the IServiceProvider, which means we need the built app and the app being built at the same time.
         // This is mainly because ASP.NET Core uses A LOT of internals for building endpoints, and the only easy way I could find to do this 
         // is by getting the IEndpointRouteBuilder configured by the MapControllerRoute call
+
         var builder = WebApplication.CreateBuilder();
         builder.Services
             .AddControllersWithViews()
             .AddApplicationPart(Assembly.LoadFrom(_siteGenerationOptions.AssemblyPath));
 
+        builder.Services.AddLogging(c =>
+        {
+            c.AddConsole();
+            
+            if (_siteGenerationOptions.Verbose)
+            {
+                c.SetMinimumLevel(LogLevel.Debug);
+            }
+        });
+
         _app = builder.Build();
-        _app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
-        
+        _app.MapControllerRoute("default", _siteGenerationOptions.DefaultRoutePattern);
+
         IEndpointRouteBuilder endpointRouteBuilder = _app;
         var endpointDataSource = endpointRouteBuilder.DataSources.First();
 

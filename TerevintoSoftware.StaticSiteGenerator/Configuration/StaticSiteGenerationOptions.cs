@@ -2,36 +2,55 @@
 
 public class StaticSiteGenerationOptions
 {
+    /// <summary>
+    /// The root directory of the site to be used for generation.
+    /// </summary>
     public string ProjectPath { get; }
+
+    /// <summary>
+    /// The directory where the generated site will be placed.
+    /// </summary>
     public string OutputPath { get; }
-    public string AssemblyPath { get; }
+
+    /// <summary>
+    /// The relative path to the assembly containing the site's content.
+    /// </summary>
+    public string RelativeAssemblyPath { get; }
+
+    /// <summary>
+    /// The name of the Base Controller (without the Controller suffix).
+    /// </summary>
     public string BaseController { get; }
 
     /// <summary>
-    /// Creates an instance of <see cref="StaticSiteGenerationOptions"/>. Uses the default view location format of "Views/{1}/{0}.cshtml"
+    /// The default route pattern, used to resolve links.
+    /// </summary>
+    public string DefaultRoutePattern { get; set; }
+
+    /// <summary>
+    /// Whether to enable verbose logs.
+    /// </summary>
+    public bool Verbose { get; set; }
+
+    /// <summary>
+    /// The path to the assembly containing the site's content. 
+    /// </summary>
+    public string AssemblyPath => Path.Combine(ProjectPath, RelativeAssemblyPath);
+
+    /// <summary>
+    /// Creates an instance of <see cref="StaticSiteGenerationOptions"/>.
     /// </summary>
     /// <param name="projectPath">The path to the MVC project's directory.</param>
     /// <param name="outputPath">The path to store the output.</param>
-    /// <param name="assemblyPath">The path to the compiled assembly.</param>
-    /// <param name="baseController">The name of the base Controller, where [Controller] is removed from the URL. Defaults to Home.</param>
-    public StaticSiteGenerationOptions(string projectPath, string outputPath, string assemblyPath, string baseController)
+    /// <param name="relativeAssemblyPath">The path to the compiled assembly, if using a non-default path.</param>
+    /// <param name="baseController">The name of the base Controller, where [Controller] is removed from the URL.</param>
+    /// <param name="defaultRoutePattern">The default route pattern.</param>
+    /// <param name="verbose">Whether to enable verbose logs</param>
+    public StaticSiteGenerationOptions(string projectPath, string outputPath, string? relativeAssemblyPath, string baseController, string defaultRoutePattern, bool verbose)
     {
         if (string.IsNullOrWhiteSpace(projectPath))
         {
             throw new ArgumentNullException(nameof(projectPath));
-        }
-        else if (!Directory.Exists(projectPath))
-        {
-            throw new ArgumentException($"The directory '{projectPath}' does not exist.");
-        }
-
-        if (string.IsNullOrEmpty(assemblyPath))
-        {
-            throw new ArgumentNullException(nameof(assemblyPath));
-        }
-        else if (!File.Exists(assemblyPath))
-        {
-            throw new ArgumentException($"The file '{assemblyPath}' does not exist.");
         }
 
         if (string.IsNullOrWhiteSpace(outputPath))
@@ -39,16 +58,26 @@ public class StaticSiteGenerationOptions
             throw new ArgumentNullException(nameof(outputPath));
         }
 
-        if (Directory.Exists(outputPath))
-        {
-            Directory.Delete(outputPath, true);
-        }
-
-        Directory.CreateDirectory(outputPath);
-
         ProjectPath = projectPath;
         OutputPath = outputPath;
-        AssemblyPath = assemblyPath;
-        BaseController = baseController ?? "Home";
+        RelativeAssemblyPath = relativeAssemblyPath ?? GetDefaultRelativeAssemblyPath(projectPath);
+        BaseController = baseController;
+        DefaultRoutePattern = defaultRoutePattern;
+        Verbose = verbose;
+    }
+
+    private static string GetDefaultRelativeAssemblyPath(string projectPath)
+    {
+        var separator = Path.DirectorySeparatorChar;
+
+        var relativeAssemblyPath = $"bin{separator}Debug{separator}net6.0{separator}{new DirectoryInfo(projectPath).Name}.dll";
+        var fullAssemblyPath = Path.Combine(projectPath, relativeAssemblyPath);
+        
+        if (File.Exists(fullAssemblyPath))
+        {
+            return relativeAssemblyPath;
+        }
+
+        throw new FileNotFoundException("Could not find compiled assembly.", fullAssemblyPath);
     }
 }

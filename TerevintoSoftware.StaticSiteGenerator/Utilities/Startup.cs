@@ -27,7 +27,15 @@ internal class Startup
 
             _builder.Services.AddSingleton<DiagnosticSource>(listener);
             _builder.Services.AddSingleton(listener);
-            _builder.Services.AddLogging(c => { c.AddConsole(); });
+            _builder.Services.AddLogging(c =>
+            {
+                c.AddConsole();
+                
+                if (staticSiteOptions.Verbose)
+                {
+                    c.SetMinimumLevel(LogLevel.Debug);
+                }
+            });
 
             _builder.Services
                 .AddControllersWithViews()

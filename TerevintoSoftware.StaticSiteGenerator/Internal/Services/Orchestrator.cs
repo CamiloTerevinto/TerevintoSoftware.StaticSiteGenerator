@@ -35,7 +35,7 @@ internal class Orchestrator : IOrchestrator
         var viewsToGenerate = FindViewsInAssembly(Assembly.LoadFrom(_staticSiteOptions.AssemblyPath));
         
         var viewGenerationResults = await _viewCompilerService.CompileViews(viewsToGenerate);
-        var baseControllerPath = $"{_staticSiteOptions.BaseController}/";
+        var baseControllerPath = $"{_staticSiteOptions.BaseController.ToLower()}/";
 
         foreach (var generationResult in viewGenerationResults)
         {
@@ -46,6 +46,7 @@ internal class Orchestrator : IOrchestrator
             else
             {
                 var view = generationResult.GeneratedView!;
+                view.GeneratedName = view.GeneratedName.ToLower();
 
                 if (view.GeneratedName.StartsWith(baseControllerPath))
                 {
