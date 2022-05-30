@@ -20,14 +20,16 @@ internal class ViewCompilerService : IViewCompilerService
     private readonly ITempDataProvider _tempDataProvider;
     private readonly IServiceProvider _serviceProvider;
     private readonly IEndpointProvider _endpointProvider;
+    private readonly IUrlFormatter _urlFormatter;
 
     public ViewCompilerService(IOptions<MvcViewOptions> viewOptions, ITempDataProvider tempDataProvider,
-        IServiceProvider serviceProvider, IEndpointProvider endpointProvider)
+        IServiceProvider serviceProvider, IEndpointProvider endpointProvider, IUrlFormatter urlFormatter)
     {
         _viewOptions = viewOptions.Value;
         _tempDataProvider = tempDataProvider;
         _serviceProvider = serviceProvider;
         _endpointProvider = endpointProvider;
+        _urlFormatter = urlFormatter;
     }
 
     public async Task<IEnumerable<ViewGenerationResult>> CompileViews(IEnumerable<string> viewsToRender)
@@ -111,7 +113,7 @@ internal class ViewCompilerService : IViewCompilerService
         return builder.ToString();
     }
 
-    private static string FixRelativeLinks(string viewName, string html)
+    private string FixRelativeLinks(string viewName, string html)
     {
         viewName = viewName.ToLower();
         var document = new HtmlDocument();
@@ -124,13 +126,7 @@ internal class ViewCompilerService : IViewCompilerService
         {
             var href = link.Attributes["href"].Value;
 
-            link.Attributes["href"].Value = href switch
-            {
-                "/" => "/index.html",
-                "/index" => "/index.html",
-                _ => Path.HasExtension(href) ? href : // If the link is to a file, ignore it
-                     FormatUrl(viewName, href) // Otherwise, format the link
-            };
+            link.Attributes["href"].Value = _urlFormatter.Format(href);
         }
 
         using var memoryStream = new MemoryStream();
@@ -139,51 +135,5 @@ internal class ViewCompilerService : IViewCompilerService
         using var reader = new StreamReader(memoryStream);
 
         return reader.ReadToEnd();
-    }
-
-    private static string FormatUrl(string viewName, string url)
-    {
-        url = url.ToLower();
-        var viewNameParts = viewName.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        var urlParts = url.Split('/', StringSplitOptions.RemoveEmptyEntries);
-
-        // When the URL's Length == 1 => there are 2 options:
-        // 1. Specific controller + /Index (default action)
-        // 2. Default controller + /Index, /About, /Contact
-        if (urlParts.Length == 1)
-        {
-            var controllerPart = "/" + viewNameParts[0];
-            
-            // Case 1:
-            if (url.StartsWith(controllerPart))
-            {
-                url = url.Remove(0, controllerPart.Length);
-                return AddHtmlExtension($"{controllerPart}/index" + url);
-            }
-            
-            // Case 2:
-            return AddHtmlExtension(url);
-        }
-
-        // Otherwise, we take the first part of the URL as the Controller, and the rest as the Action.
-
-        return AddHtmlExtension(url);
-    }
-
-    /// <summary>
-    /// Adds the .html extension to the URL, and looks for a fragment to avoid adding it twice
-    /// </summary>
-    /// <param name="url">The URL to add the .html extension to.</param>
-    /// <returns>The updated URL.</returns>
-    private static string AddHtmlExtension(string url)
-    {
-        var parts = url.Split('#');
-
-        if (parts.Length == 1)
-        {
-            return url + ".html";
-        }
-
-        return parts[0] + ".html#" + parts[1];
     }
 }

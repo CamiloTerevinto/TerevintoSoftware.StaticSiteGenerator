@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Razor.Hosting;
-using System.Reflection;
+﻿using TerevintoSoftware.StaticSiteGenerator.Configuration;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Internal.Services;
 
@@ -8,11 +6,14 @@ internal class Orchestrator : IOrchestrator
 {
     private readonly IViewCompilerService _viewCompilerService;
     private readonly StaticSiteGenerationOptions _staticSiteOptions;
+    private readonly SiteAssemblyInformation _siteAssemblyInformation;
 
-    public Orchestrator(IViewCompilerService viewCompilerService, StaticSiteGenerationOptions staticSiteOptions)
+    public Orchestrator(IViewCompilerService viewCompilerService,
+        StaticSiteGenerationOptions staticSiteOptions, SiteAssemblyInformation siteAssemblyInformation)
     {
         _viewCompilerService = viewCompilerService;
         _staticSiteOptions = staticSiteOptions;
+        _siteAssemblyInformation = siteAssemblyInformation;
     }
 
     public async Task<StaticSiteGenerationResult> BuildStaticFilesAsync()
@@ -32,8 +33,8 @@ internal class Orchestrator : IOrchestrator
         var views = new List<string>();
         var errors = new List<string>();
 
-        var viewsToGenerate = FindViewsInAssembly(Assembly.LoadFrom(_staticSiteOptions.AssemblyPath));
-        
+        var viewsToGenerate = _siteAssemblyInformation.ViewsFound;
+
         var viewGenerationResults = await _viewCompilerService.CompileViews(viewsToGenerate);
         var baseControllerPath = $"{_staticSiteOptions.BaseController.ToLower()}/";
 
@@ -42,28 +43,27 @@ internal class Orchestrator : IOrchestrator
             if (generationResult.Failed)
             {
                 errors.Add($"View {generationResult.OriginalViewName} => {generationResult.ErrorMessage!}");
+                continue;
             }
-            else
+
+            var view = generationResult.GeneratedView!;
+            view.GeneratedName = view.GeneratedName.ToLower();
+
+            if (view.GeneratedName.StartsWith(baseControllerPath))
             {
-                var view = generationResult.GeneratedView!;
-                view.GeneratedName = view.GeneratedName.ToLower();
-
-                if (view.GeneratedName.StartsWith(baseControllerPath))
-                {
-                    view.GeneratedName = view.GeneratedName[baseControllerPath.Length..];
-                }
-                
-                var staticViewPath = Path.Combine(_staticSiteOptions.OutputPath, view.GeneratedName);
-
-                if (!Directory.Exists(Path.GetDirectoryName(staticViewPath)))
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(staticViewPath)!);
-                }
-
-                File.WriteAllText(staticViewPath, view.GeneratedHtml);
-
-                views.Add($"View {generationResult.OriginalViewName} => {view.GeneratedName}");
+                view.GeneratedName = view.GeneratedName[baseControllerPath.Length..];
             }
+
+            var staticViewPath = Path.Combine(_staticSiteOptions.OutputPath, view.GeneratedName);
+
+            if (!Directory.Exists(Path.GetDirectoryName(staticViewPath)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(staticViewPath)!);
+            }
+
+            File.WriteAllText(staticViewPath, view.GeneratedHtml);
+
+            views.Add($"View {generationResult.OriginalViewName} => {view.GeneratedName}");
         }
 
         return (errors, views);
@@ -87,30 +87,5 @@ internal class Orchestrator : IOrchestrator
         {
             File.Copy(filePath, filePath.Replace(origin, destination));
         });
-    }
-
-    private static IReadOnlyCollection<string> FindViewsInAssembly(Assembly assembly)
-    {
-        var nonModelViewBaseType = typeof(RazorPage<object>);
-        
-        return assembly.GetCustomAttributes<RazorCompiledItemAttribute>()
-            .Where(x => nonModelViewBaseType.IsAssignableFrom(x.Type) && 
-                        !x.Identifier.Contains("_Layout") &&
-                        !x.Identifier.Contains("_ViewStart") &&
-                        !x.Identifier.Contains("_ViewImports"))
-            .Select(x =>
-            {
-                // remove /views/ from x.Identifier
-                var identifier = x.Identifier.Substring(7);
-
-                // remove .cshtml from identifier
-                var index = identifier.LastIndexOf(".cshtml", StringComparison.Ordinal);
-                if (index > 0)
-                {
-                    identifier = identifier.Substring(0, index);
-                }
-
-                return identifier;
-            }).ToArray();
     }
 }

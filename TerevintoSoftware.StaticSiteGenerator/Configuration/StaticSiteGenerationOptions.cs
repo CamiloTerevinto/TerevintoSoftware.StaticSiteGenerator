@@ -35,7 +35,7 @@ public class StaticSiteGenerationOptions
     /// <summary>
     /// The path to the assembly containing the site's content. 
     /// </summary>
-    public string AssemblyPath => Path.Combine(ProjectPath, RelativeAssemblyPath);
+    internal string AssemblyPath => Path.Combine(ProjectPath, RelativeAssemblyPath);
 
     /// <summary>
     /// Creates an instance of <see cref="StaticSiteGenerationOptions"/>.
