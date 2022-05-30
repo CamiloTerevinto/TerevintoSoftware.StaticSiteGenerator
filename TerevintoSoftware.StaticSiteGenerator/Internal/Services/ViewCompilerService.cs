@@ -43,7 +43,7 @@ internal class ViewCompilerService : IViewCompilerService
             {
                 var html = await GetCompiledView(viewName);
 
-                html = FixRelativeLinks(viewName, html);
+                html = FixRelativeLinks(html);
 
                 bag.Add(new ViewGenerationResult(viewName, new GeneratedView(viewName + ".html", html)));
             }
@@ -113,9 +113,8 @@ internal class ViewCompilerService : IViewCompilerService
         return builder.ToString();
     }
 
-    private string FixRelativeLinks(string viewName, string html)
+    private string FixRelativeLinks(string html)
     {
-        viewName = viewName.ToLower();
         var document = new HtmlDocument();
         document.LoadHtml(html);
 

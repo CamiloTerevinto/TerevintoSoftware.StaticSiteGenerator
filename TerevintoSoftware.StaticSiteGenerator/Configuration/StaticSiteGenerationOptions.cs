@@ -1,4 +1,6 @@
-﻿namespace TerevintoSoftware.StaticSiteGenerator;
+﻿using TerevintoSoftware.StaticSiteGenerator.Configuration;
+
+namespace TerevintoSoftware.StaticSiteGenerator;
 
 public class StaticSiteGenerationOptions
 {
@@ -25,12 +27,14 @@ public class StaticSiteGenerationOptions
     /// <summary>
     /// The default route pattern, used to resolve links.
     /// </summary>
-    public string DefaultRoutePattern { get; set; }
+    public string DefaultRoutePattern { get; }
 
     /// <summary>
     /// Whether to enable verbose logs.
     /// </summary>
-    public bool Verbose { get; set; }
+    public bool Verbose { get; }
+
+    public RouteCasing RouteCasing { get; }
 
     /// <summary>
     /// The path to the assembly containing the site's content. 
@@ -45,8 +49,10 @@ public class StaticSiteGenerationOptions
     /// <param name="relativeAssemblyPath">The path to the compiled assembly, if using a non-default path.</param>
     /// <param name="baseController">The name of the base Controller, where [Controller] is removed from the URL.</param>
     /// <param name="defaultRoutePattern">The default route pattern.</param>
-    /// <param name="verbose">Whether to enable verbose logs</param>
-    public StaticSiteGenerationOptions(string projectPath, string outputPath, string? relativeAssemblyPath, string baseController, string defaultRoutePattern, bool verbose)
+    /// <param name="routeCasing">The casing convention to use for routes.</param>
+    /// <param name="verbose">Whether to enable verbose logs.</param>
+    public StaticSiteGenerationOptions(string projectPath, string outputPath, string? relativeAssemblyPath, string baseController, 
+        string defaultRoutePattern, RouteCasing routeCasing, bool verbose)
     {
         if (string.IsNullOrWhiteSpace(projectPath))
         {
@@ -63,6 +69,7 @@ public class StaticSiteGenerationOptions
         RelativeAssemblyPath = relativeAssemblyPath ?? GetDefaultRelativeAssemblyPath(projectPath);
         BaseController = baseController;
         DefaultRoutePattern = defaultRoutePattern;
+        RouteCasing = routeCasing;
         Verbose = verbose;
     }
 

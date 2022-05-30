@@ -1,4 +1,5 @@
 ﻿using TerevintoSoftware.StaticSiteGenerator.Configuration;
+using TerevintoSoftware.StaticSiteGenerator.Utilities;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Internal.Services;
 
@@ -46,20 +47,14 @@ internal class Orchestrator : IOrchestrator
                 continue;
             }
 
-            var view = generationResult.GeneratedView!;
-            view.GeneratedName = view.GeneratedName.ToLower();
-
-            if (view.GeneratedName.StartsWith(baseControllerPath))
-            {
-                view.GeneratedName = view.GeneratedName[baseControllerPath.Length..];
-            }
-
-            var staticViewPath = Path.Combine(_staticSiteOptions.OutputPath, view.GeneratedName);
+            string staticViewPath = GetNewViewPath(baseControllerPath, generationResult);
 
             if (!Directory.Exists(Path.GetDirectoryName(staticViewPath)))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(staticViewPath)!);
             }
+
+            var view = generationResult.GeneratedView!;
 
             File.WriteAllText(staticViewPath, view.GeneratedHtml);
 
@@ -67,6 +62,19 @@ internal class Orchestrator : IOrchestrator
         }
 
         return (errors, views);
+    }
+
+    private string GetNewViewPath(string baseControllerPath, ViewGenerationResult generationResult)
+    {
+        var view = generationResult.GeneratedView!;
+        view.GeneratedName = view.GeneratedName.ToCasing(_staticSiteOptions.RouteCasing);
+
+        if (view.GeneratedName.StartsWith(baseControllerPath))
+        {
+            view.GeneratedName = view.GeneratedName[baseControllerPath.Length..];
+        }
+
+        return Path.Combine(_staticSiteOptions.OutputPath, view.GeneratedName);
     }
 
     private void CopyStaticAssets()

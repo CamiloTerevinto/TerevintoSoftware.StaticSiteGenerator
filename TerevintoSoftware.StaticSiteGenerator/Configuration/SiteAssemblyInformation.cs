@@ -2,12 +2,12 @@
 
 internal class SiteAssemblyInformation
 {
-    public IReadOnlyCollection<string> ViewsFound { get; set; }
-    public IReadOnlyCollection<string> ControllersFound { get; set; }
+    internal IReadOnlyCollection<string> ViewsFound { get; }
+    internal IReadOnlyCollection<string> ControllersFound { get; }
 
-    public SiteAssemblyInformation(IReadOnlyCollection<string> viewsFound, IReadOnlyCollection<string> controllersFound)
+    internal SiteAssemblyInformation(IReadOnlyCollection<string> controllersFound, IReadOnlyCollection<string> viewsFound)
     {
-        ViewsFound = viewsFound;
-        ControllersFound = controllersFound;
+        ViewsFound = viewsFound ?? throw new ArgumentNullException(nameof(viewsFound));
+        ControllersFound = controllersFound ?? throw new ArgumentNullException(nameof(controllersFound));
     }
 }

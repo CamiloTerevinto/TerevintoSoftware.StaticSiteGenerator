@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.RenderTree;
 using System.CommandLine;
 using System.CommandLine.Binding;
+using TerevintoSoftware.StaticSiteGenerator.Configuration;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Tool;
 
@@ -11,6 +12,7 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
     private readonly Option<string?> _relativeAssemblyPathOption;
     private readonly Option<string> _baseControllerOption;
     private readonly Option<string> _defaultRouteTemplateOption;
+    private readonly Option<RouteCasing> _routeCasingOption;
     private readonly Option<bool> _verboseOption;
 
     public StaticSiteGenerationOptionsBinder()
@@ -20,6 +22,7 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
         _relativeAssemblyPathOption = BuildAssemblyPathOption();
         _baseControllerOption = BuildBaseControllerOption();
         _defaultRouteTemplateOption = BuildDefaultRouteTemplateOption();
+        _routeCasingOption = BuildRouteCasingOption();
         _verboseOption = BuildVerboseOption();
     }
 
@@ -40,6 +43,7 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
         rootCommand.AddOption(binder._relativeAssemblyPathOption);
         rootCommand.AddOption(binder._baseControllerOption);
         rootCommand.AddOption(binder._defaultRouteTemplateOption);
+        rootCommand.AddOption(binder._routeCasingOption);
         rootCommand.AddOption(binder._verboseOption);
 
         rootCommand.SetHandler(async (StaticSiteGenerationOptions options) =>
@@ -84,6 +88,7 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
             bindingContext.ParseResult.GetValueForOption(_relativeAssemblyPathOption),
             bindingContext.ParseResult.GetValueForOption(_baseControllerOption)!,
             bindingContext.ParseResult.GetValueForOption(_defaultRouteTemplateOption)!,
+            bindingContext.ParseResult.GetValueForOption(_routeCasingOption),
             bindingContext.ParseResult.GetValueForOption(_verboseOption));
     }
 
@@ -209,6 +214,16 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
         return defaultRouteTemplateOption;
     }
 
+    private Option<RouteCasing> BuildRouteCasingOption()
+    {
+        var routeNamingFormatOption = new Option<RouteCasing>(
+            "--route-casing",
+            () => RouteCasing.LowerCase,
+            description: "The casing convention to use for routes.");
+
+        return routeNamingFormatOption;
+    }
+    
     private static Option<bool> BuildVerboseOption()
     {
         var verboseOption = new Option<bool>(
