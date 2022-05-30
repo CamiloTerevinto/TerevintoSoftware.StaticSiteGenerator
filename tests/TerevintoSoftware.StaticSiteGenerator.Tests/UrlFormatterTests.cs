@@ -8,13 +8,24 @@ namespace TerevintoSoftware.StaticSiteGenerator.Tests;
 public class UrlFormatterTests
 {
     private readonly SiteAssemblyInformation _siteAssemblyInformation = new(new[] { "Home", "Blog" }, Array.Empty<string>());
-    private readonly StaticSiteGenerationOptions _lowerCaseOptions = new("test", "test", "", "", "", RouteCasing.LowerCase, false);
-    private readonly StaticSiteGenerationOptions _kebabCaseOptions = new("test", "test", "", "", "", RouteCasing.KebabCase, false);
-    private readonly StaticSiteGenerationOptions _keepCaseOptions = new("test", "test", "", "", "", RouteCasing.KeepOriginal, false);
+    private readonly StaticSiteGenerationOptions _lowerCaseOptions = new("test", "test", "", "Home", "", RouteCasing.LowerCase, false);
+    private readonly StaticSiteGenerationOptions _kebabCaseOptions = new("test", "test", "", "Home", "", RouteCasing.KebabCase, false);
+    private readonly StaticSiteGenerationOptions _keepCaseOptions = new("test", "test", "", "Home", "", RouteCasing.KeepOriginal, false);
 
     [TestCase("/", "/index.html")]
     [TestCase("/Blog", "/blog/index.html")]
     public void FormatUrl_ShouldReturnTheUrlWithIndexHtmlAdded(string inputUrl, string expectedOutputUrl)
+    {
+        var urlFormatter = new UrlFormatter(_siteAssemblyInformation, _lowerCaseOptions);
+
+        var outputUrl = urlFormatter.Format(inputUrl);
+        Assert.That(outputUrl, Is.EqualTo(expectedOutputUrl));
+    }
+    
+    [TestCase("/About", "/about.html")]
+    [TestCase("/Home/About", "/about.html")]
+    [TestCase("/Home/About/us", "/about/us.html")]
+    public void FormatUrl_ShouldRemoveTheHomePathFromTheUrlAndAddHtmlExtension(string inputUrl, string expectedOutputUrl)
     {
         var urlFormatter = new UrlFormatter(_siteAssemblyInformation, _lowerCaseOptions);
 
@@ -32,7 +43,6 @@ public class UrlFormatterTests
     }
 
     [TestCase("/Blog/About", "/blog/about.html")]
-    [TestCase("/About", "/about.html")]
     public void FormatUrl_ShouldReturnTheUrlWithHtmlExtension(string inputUrl, string expectedOutputUrl)
     {
         var urlFormatter = new UrlFormatter(_siteAssemblyInformation, _lowerCaseOptions);

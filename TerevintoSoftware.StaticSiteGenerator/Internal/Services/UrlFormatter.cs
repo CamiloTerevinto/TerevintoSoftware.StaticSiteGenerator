@@ -12,11 +12,13 @@ internal class UrlFormatter : IUrlFormatter
 {
     private readonly SiteAssemblyInformation _siteAssemblyInformation;
     private readonly RouteCasing _casing;
+    private readonly string _defaultController;
 
     public UrlFormatter(SiteAssemblyInformation siteAssemblyInformation, StaticSiteGenerationOptions staticSiteGenerationOptions)
     {
         _siteAssemblyInformation = siteAssemblyInformation;
         _casing = staticSiteGenerationOptions.RouteCasing;
+        _defaultController = staticSiteGenerationOptions.BaseController;
     }
 
     public string Format(string url)
@@ -44,6 +46,13 @@ internal class UrlFormatter : IUrlFormatter
         if (controller == null)
         {
             return AddHtmlExtension(url);
+        }
+
+        // When the controller refers to the default controller and the URL has 2 parts, the controller part is ommitted
+        // i.e., /Home/About => /About.html
+        if (controller == _defaultController)
+        {
+            return AddHtmlExtension("/" + string.Join('/', urlParts.Skip(1)));
         }
 
         // When the URL refers only to a controller, it means it uses the default action.
