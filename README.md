@@ -1,4 +1,4 @@
-# TerevintoSoftware.StaticSiteGenerator
+# Static Site Generator
 
 This project aims to provide a way for c# developers to benefit from very cheap/free hosting through static files, 
 while allowing them to use familiar ASP.NET MVC concepts (Views, Partials, Layouts, etc).
@@ -22,12 +22,22 @@ This project is divided in two packages:
 3. (optional) See the available options with `ssg -h`
 4. Run the static site generation: `ssg --project [project-path] --output [output-path]`
 
+The main website for testing out the basic set of features in this tool is [here](https://ctssgdemo.z16.web.core.windows.net/index.html).
+
 ## How to build
 
 * Install Visual Studio 2022 (.NET 6 required), if needed. The ASP.NET Core workload is required to build the project.
 * Install git, if needed.
 * Clone this repository.
 * Build from Visual Studio or through `dotnet build`.
+
+### Running tests
+
+Once the solution is compiled, tests can be run either from Visual Studio's Test Explorer window, or through `dotnet test`.
+
+## License
+
+The .NET Tool and this solution are licensed under the [MIT license](/LICENSE).
 
 ## Bug reports and feature requests
 
