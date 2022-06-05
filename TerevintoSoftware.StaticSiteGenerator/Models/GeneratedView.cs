@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace TerevintoSoftware.StaticSiteGenerator.Internal;
+namespace TerevintoSoftware.StaticSiteGenerator.Models;
 
 [DebuggerDisplay("{DebuggerDisplay}")]
 internal class ViewGenerationResult
@@ -27,14 +27,4 @@ internal class ViewGenerationResult
     private string DebuggerDisplay => $"{OriginalViewName} => {(Failed ? "failed" : "generated")}";
 }
 
-internal class GeneratedView
-{
-    public string GeneratedName { get; set; }
-    public string GeneratedHtml { get; set; }
-
-    public GeneratedView(string generatedName, string generatedHtml)
-    {
-        GeneratedName = generatedName;
-        GeneratedHtml = generatedHtml;
-    }
-}
+internal record GeneratedView(string GeneratedName, string GeneratedHtml, string? Culture);

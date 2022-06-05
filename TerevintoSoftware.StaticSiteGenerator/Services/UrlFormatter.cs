@@ -31,7 +31,7 @@ internal class UrlFormatter : IUrlFormatter
             return "/Index.html".ToCasing(_casing);
         }
 
-        var controller = _siteAssemblyInformation.ControllersFound.FirstOrDefault(x =>
+        var controller = _siteAssemblyInformation.Controllers.FirstOrDefault(x =>
         {
             if (urlParts[0].Contains('#'))
             {

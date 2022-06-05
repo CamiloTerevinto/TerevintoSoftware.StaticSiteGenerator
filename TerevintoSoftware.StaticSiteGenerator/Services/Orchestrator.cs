@@ -1,4 +1,5 @@
 ﻿using TerevintoSoftware.StaticSiteGenerator.Configuration;
+using TerevintoSoftware.StaticSiteGenerator.Models;
 using TerevintoSoftware.StaticSiteGenerator.Utilities;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Internal.Services;
@@ -34,7 +35,7 @@ internal class Orchestrator : IOrchestrator
         var views = new List<string>();
         var errors = new List<string>();
 
-        var viewsToGenerate = _siteAssemblyInformation.ViewsFound;
+        var viewsToGenerate = _siteAssemblyInformation.Views;
 
         var viewGenerationResults = await _viewCompilerService.CompileViews(viewsToGenerate);
         var baseControllerPath = $"{_staticSiteOptions.BaseController.ToLower()}/";
@@ -57,6 +58,16 @@ internal class Orchestrator : IOrchestrator
             var view = generationResult.GeneratedView!;
 
             File.WriteAllText(staticViewPath, view.GeneratedHtml);
+            
+            // If this is the main/default view and also the default language,
+            // we copy the file again as just /index.html, so it can serve as an entry point
+            // for hosting providers that asks for an index.html at the root
+            if (_staticSiteOptions.UseLocalization && 
+                generationResult.OriginalViewName.ToLower() == $"{_staticSiteOptions.BaseController.ToLower()}/index" &&
+                view.Culture == _staticSiteOptions.DefaultCulture)
+            {
+                File.WriteAllText(Path.Combine(_staticSiteOptions.OutputPath, Path.GetFileName(staticViewPath)), view.GeneratedHtml);
+            }
 
             views.Add($"View {generationResult.OriginalViewName} => {view.GeneratedName}");
         }
@@ -66,15 +77,21 @@ internal class Orchestrator : IOrchestrator
 
     private string GetNewViewPath(string baseControllerPath, ViewGenerationResult generationResult)
     {
-        var view = generationResult.GeneratedView!;
-        view.GeneratedName = view.GeneratedName.ToCasing(_staticSiteOptions.RouteCasing);
+        var generatedName = generationResult.GeneratedView!.GeneratedName.ToCasing(_staticSiteOptions.RouteCasing);
 
-        if (view.GeneratedName.StartsWith(baseControllerPath))
+        if (generatedName.StartsWith(baseControllerPath))
         {
-            view.GeneratedName = view.GeneratedName[baseControllerPath.Length..];
+            generatedName = generatedName[baseControllerPath.Length..];
         }
 
-        return Path.Combine(_staticSiteOptions.OutputPath, view.GeneratedName);
+        if (generationResult.GeneratedView.Culture != null)
+        {
+            generatedName = $"{generationResult.GeneratedView.Culture}/{generatedName}";
+        }
+
+        generationResult.GeneratedView = generationResult.GeneratedView with { GeneratedName = generatedName };
+
+        return Path.Combine(_staticSiteOptions.OutputPath, generatedName);
     }
 
     private void CopyStaticAssets()

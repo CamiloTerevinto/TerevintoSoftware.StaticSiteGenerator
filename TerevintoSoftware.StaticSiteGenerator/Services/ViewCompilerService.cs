@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -9,8 +10,12 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Text;
 using TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
+using TerevintoSoftware.StaticSiteGenerator.Configuration;
+using TerevintoSoftware.StaticSiteGenerator.Models;
+using TerevintoSoftware.StaticSiteGenerator.Services;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Internal.Services;
 
@@ -20,60 +25,64 @@ internal class ViewCompilerService : IViewCompilerService
     private readonly ITempDataProvider _tempDataProvider;
     private readonly IServiceProvider _serviceProvider;
     private readonly IEndpointProvider _endpointProvider;
-    private readonly IUrlFormatter _urlFormatter;
+    private readonly IHtmlFormatter _htmlFormatter;
+    private readonly StaticSiteGenerationOptions _staticSiteGenerationOptions;
 
     public ViewCompilerService(IOptions<MvcViewOptions> viewOptions, ITempDataProvider tempDataProvider,
-        IServiceProvider serviceProvider, IEndpointProvider endpointProvider, IUrlFormatter urlFormatter)
+        IServiceProvider serviceProvider, IEndpointProvider endpointProvider, IHtmlFormatter htmlFormatter,
+        StaticSiteGenerationOptions staticSiteGenerationOptions)
     {
         _viewOptions = viewOptions.Value;
         _tempDataProvider = tempDataProvider;
         _serviceProvider = serviceProvider;
         _endpointProvider = endpointProvider;
-        _urlFormatter = urlFormatter;
+        _htmlFormatter = htmlFormatter;
+        _staticSiteGenerationOptions = staticSiteGenerationOptions;
     }
 
-    public async Task<IEnumerable<ViewGenerationResult>> CompileViews(IEnumerable<string> viewsToRender)
+    public async Task<IEnumerable<ViewGenerationResult>> CompileViews(IEnumerable<CultureBasedView> viewsToRender)
     {
         var bag = new ConcurrentBag<ViewGenerationResult>();
 
+        var views = viewsToRender.SelectMany(x => x.Cultures.Select(y => (viewName: x.ViewName, culture: y)));
+
 #if DEBUG
-        foreach (var viewName in viewsToRender)
+        foreach (var view in views)
+#else
+        await Parallel.ForEachAsync(views, async (view, ct) =>
+#endif
         {
+            var (viewNameWithoutCulture, culture) = view;
+
+            var viewName = viewNameWithoutCulture;
+
+            if (culture != _staticSiteGenerationOptions.DefaultCulture)
+            {
+                viewName += "." + culture;
+            }
+
             try
             {
-                var html = await GetCompiledView(viewName);
+                var html = await GetCompiledView(viewName, culture);
 
-                html = FixRelativeLinks(html);
+                html = _htmlFormatter.FixRelativeLinks(html, culture);
 
-                bag.Add(new ViewGenerationResult(viewName, new GeneratedView(viewName + ".html", html)));
+                bag.Add(new ViewGenerationResult(viewName, new GeneratedView(viewNameWithoutCulture + ".html", html, culture)));
             }
             catch (Exception ex)
             {
                 bag.Add(new ViewGenerationResult(viewName, ex.Message));
             }
+#if DEBUG           
         }
 #else
-        await Parallel.ForEachAsync(viewsToRender, async (viewName, ct) =>
-        {
-            try
-            {
-                var html = await GetCompiledView(viewName);
-
-                html = FixRelativeLinks(viewName, html);
-
-                bag.Add(new ViewGenerationResult(viewName, new GeneratedView(viewName + ".html", html)));
-            }
-            catch (Exception ex)
-            {
-                bag.Add(new ViewGenerationResult(viewName, ex.Message));
-            }
         });
 #endif
-        
+
         return bag.ToArray();
     }
 
-    private async Task<string> GetCompiledView(string viewName)
+    private async Task<string> GetCompiledView(string viewName, string? culture)
     {
         using var scope = _serviceProvider.CreateScope();
         var context = new DefaultHttpContext
@@ -83,6 +92,10 @@ internal class ViewCompilerService : IViewCompilerService
         context.SetEndpoint(_endpointProvider.Endpoint);
         var routeData = context.GetRouteData();
 
+        var cultureInfo = new CultureInfo(culture ?? _staticSiteGenerationOptions.DefaultCulture);
+        Thread.CurrentThread.CurrentCulture = cultureInfo;
+        Thread.CurrentThread.CurrentUICulture = cultureInfo;
+        
         var actionContext = new ActionContext(context, routeData, new ActionDescriptor());
 
         var viewEngine = _viewOptions.ViewEngines.First();
@@ -111,28 +124,5 @@ internal class ViewCompilerService : IViewCompilerService
         }
 
         return builder.ToString();
-    }
-
-    private string FixRelativeLinks(string html)
-    {
-        var document = new HtmlDocument();
-        document.LoadHtml(html);
-
-        // get links that start with /
-        var links = document.DocumentNode.SelectNodes("//a[starts-with(@href, '/')]");
-
-        foreach (var link in links)
-        {
-            var href = link.Attributes["href"].Value;
-
-            link.Attributes["href"].Value = _urlFormatter.Format(href);
-        }
-
-        using var memoryStream = new MemoryStream();
-        document.Save(memoryStream);
-        memoryStream.Position = 0;
-        using var reader = new StreamReader(memoryStream);
-
-        return reader.ReadToEnd();
     }
 }

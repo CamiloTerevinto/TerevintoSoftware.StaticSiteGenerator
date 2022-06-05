@@ -1,4 +1,4 @@
-﻿namespace TerevintoSoftware.StaticSiteGenerator;
+﻿namespace TerevintoSoftware.StaticSiteGenerator.Models;
 
 /// <summary>
 /// Contains the result of a static site generation.

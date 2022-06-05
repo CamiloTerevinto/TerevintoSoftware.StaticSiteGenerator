@@ -30,10 +30,23 @@ public class StaticSiteGenerationOptions
     public string DefaultRoutePattern { get; }
 
     /// <summary>
+    /// Defines whether to render views using multiple cultures.
+    /// </summary>
+    public bool UseLocalization { get; }
+
+    /// <summary>
+    /// Defines the default culture to use when rendering views.
+    /// </summary>
+    public string DefaultCulture { get; }
+    
+    /// <summary>
     /// Whether to enable verbose logs.
     /// </summary>
     public bool Verbose { get; }
 
+    /// <summary>
+    /// The casing strategy to use for generating routes.
+    /// </summary>
     public RouteCasing RouteCasing { get; }
 
     /// <summary>
@@ -50,9 +63,11 @@ public class StaticSiteGenerationOptions
     /// <param name="baseController">The name of the base Controller, where [Controller] is removed from the URL.</param>
     /// <param name="defaultRoutePattern">The default route pattern.</param>
     /// <param name="routeCasing">The casing convention to use for routes.</param>
+    /// <param name="defaultCulture">The default culture to use for rendering views.</param>
+    /// <param name="useLocalization">Whether to enable localization for rendering views.</param>
     /// <param name="verbose">Whether to enable verbose logs.</param>
     public StaticSiteGenerationOptions(string projectPath, string outputPath, string? relativeAssemblyPath, string baseController, 
-        string defaultRoutePattern, RouteCasing routeCasing, bool verbose)
+        string defaultRoutePattern, RouteCasing routeCasing, string? defaultCulture, bool useLocalization, bool verbose)
     {
         if (string.IsNullOrWhiteSpace(projectPath))
         {
@@ -70,6 +85,8 @@ public class StaticSiteGenerationOptions
         BaseController = baseController;
         DefaultRoutePattern = defaultRoutePattern;
         RouteCasing = routeCasing;
+        DefaultCulture = defaultCulture ?? "en";
+        UseLocalization = useLocalization;
         Verbose = verbose;
     }
 

@@ -8,37 +8,42 @@ namespace TerevintoSoftware.StaticSiteGenerator.Utilities;
 
 internal static class SiteAssemblyInformationFactory
 {
-    internal static SiteAssemblyInformation GetAssemblyInformation(Assembly assembly)
+    internal static SiteAssemblyInformation GetAssemblyInformation(Assembly assembly, string defaultCulture)
     {
         var exportedTypes = assembly.GetExportedTypes();
         var customAttributes = assembly.GetCustomAttributes();
+        var controllersFound = FindControllerNames(exportedTypes);
+        var views = GetViewCultures(exportedTypes, customAttributes, defaultCulture);
 
-        return new SiteAssemblyInformation(FindControllerNames(exportedTypes), FindViews(exportedTypes, customAttributes));
+        return new SiteAssemblyInformation(controllersFound, views);
     }
 
-    private static IReadOnlyCollection<string> FindViews(IEnumerable<Type> exportedTypes, IEnumerable<Attribute> customAttributes)
+    private static IReadOnlyCollection<CultureBasedView> GetViewCultures(IEnumerable<Type> exportedTypes, IEnumerable<Attribute> customAttributes, string defaultCulture)
     {
-        var nonModelViewBaseType = typeof(RazorPage<object>);
-        var actionRoutes = FindActionRoutes(exportedTypes);
+        var views = FindViews(exportedTypes, customAttributes);
+        
+        return views.Select(viewName =>
+        {
+            // The viewName does not have the .cshtml extension at this point,
+            // so we can assume that a dot is for a specific culture.
+            var parts = viewName.Split('.');
 
-        return customAttributes
-            .OfType<RazorCompiledItemAttribute>()
-            .Where(x => nonModelViewBaseType.IsAssignableFrom(x.Type) &&
-                   actionRoutes.Any(v => x.Identifier == $"/Views/{v}.cshtml"))
-            .Select(x =>
+            if (parts.Length == 1)
             {
-                // remove /views/ from x.Identifier
-                var identifier = x.Identifier[7..];
+                return (viewName, defaultCulture);
+            }
 
-                // remove .cshtml from identifier
-                var index = identifier.LastIndexOf(".cshtml", StringComparison.Ordinal);
-                if (index > 0)
-                {
-                    identifier = identifier[..index];
-                }
+            // If the file has a dot, and the part after the dot has a length of 2 or 5, it's probably a culture.
+            // Valid culture examples: Index.es, Index.es-ES, Index.en-US.
+            if (parts[1].Length != 2 && parts[1].Length != 5)
+            {
+                return (viewName, defaultCulture);
+            }
 
-                return identifier;
-            })
+            return (parts[0], parts[1]);
+        })
+            .GroupBy(x => x.Item1)
+            .Select(x => new CultureBasedView(x.Key, x.Select(y => y.Item2).ToArray()))
             .ToArray();
     }
 
@@ -95,5 +100,57 @@ internal static class SiteAssemblyInformationFactory
         var controllerBaseType = typeof(Controller);
 
         return exportedTypes.Where(x => controllerBaseType.IsAssignableFrom(x));
+    }
+
+    private static IEnumerable<string> FindViews(IEnumerable<Type> exportedTypes, IEnumerable<Attribute> customAttributes)
+    {
+        var nonModelViewBaseType = typeof(RazorPage<object>);
+        var actionRoutes = FindActionRoutes(exportedTypes);
+
+        return customAttributes
+            .OfType<RazorCompiledItemAttribute>()
+            .Where(x =>
+            {
+                // We only accept Views that do not have a Model declared, which unfortunately means
+                // accepting types that inherit from `RazorPage<object>`.
+                // If someone has a view with `@model object`, it would slip through here, which is unwanted as it couldn't be rendered.
+                if (!nonModelViewBaseType.IsAssignableFrom(x.Type))
+                {
+                    return false;
+                }
+
+                return actionRoutes.Any(v =>
+                {
+                    var viewPath = $"/Views/{v}";
+                    var viewFilename = $"{viewPath}.cshtml";
+
+                    if (viewFilename == x.Identifier)
+                    {
+                        return true;
+                    }
+
+                    // For example: /Views/Home/Index.es.cshtml => represents a localized view
+                    if (x.Identifier.StartsWith(viewPath + ".") && x.Identifier.EndsWith(".cshtml"))
+                    {
+                        return true;
+                    }
+
+                    return false;
+                });
+            })
+            .Select(x =>
+            {
+                // Remove /views/ from x.Identifier
+                var identifier = x.Identifier[7..];
+
+                // Remove .cshtml from identifier
+                var index = identifier.LastIndexOf(".cshtml", StringComparison.Ordinal);
+                if (index > 0)
+                {
+                    identifier = identifier[..index];
+                }
+
+                return identifier;
+            });
     }
 }

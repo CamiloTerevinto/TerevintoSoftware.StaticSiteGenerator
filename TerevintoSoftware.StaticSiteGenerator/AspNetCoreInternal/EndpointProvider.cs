@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using TerevintoSoftware.StaticSiteGenerator.Configuration;
 
 namespace TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
 
@@ -14,17 +16,20 @@ namespace TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
 /// This is needed because the app generated lacks the route information, so the DefaultLinkGenerator fails to generate links.
 /// </para>
 /// </summary>
+[ExcludeFromCodeCoverage]
 internal class EndpointProvider : IEndpointProvider, IAsyncDisposable
 {
     private readonly StaticSiteGenerationOptions _siteGenerationOptions;
+    private readonly SiteAssemblyInformation _siteAssemblyInformation;
     private WebApplication _app = default!;
 
     public Endpoint Endpoint { get; }
     public IEndpointAddressScheme<RouteValuesAddress> EndpointAddressScheme { get; }
 
-    public EndpointProvider(StaticSiteGenerationOptions siteGenerationOptions)
+    public EndpointProvider(StaticSiteGenerationOptions siteGenerationOptions, SiteAssemblyInformation siteAssemblyInformation)
     {
         _siteGenerationOptions = siteGenerationOptions;
+        _siteAssemblyInformation = siteAssemblyInformation;
         (Endpoint, EndpointAddressScheme) = Initialize();
     }
 
@@ -43,7 +48,7 @@ internal class EndpointProvider : IEndpointProvider, IAsyncDisposable
         builder.Services.AddLogging(c =>
         {
             c.AddConsole();
-            
+
             if (_siteGenerationOptions.Verbose)
             {
                 c.SetMinimumLevel(LogLevel.Debug);

@@ -1,13 +1,23 @@
 ﻿namespace TerevintoSoftware.StaticSiteGenerator.Configuration;
 
+/// <summary>
+/// Contains the types found in the assembly to use for generation.
+/// </summary>
 internal class SiteAssemblyInformation
 {
-    internal IReadOnlyCollection<string> ViewsFound { get; }
-    internal IReadOnlyCollection<string> ControllersFound { get; }
+    /// <summary>
+    /// The views that were found in the assembly and can be generated.
+    /// </summary>
+    internal IReadOnlyCollection<CultureBasedView> Views { get; }
 
-    internal SiteAssemblyInformation(IReadOnlyCollection<string> controllersFound, IReadOnlyCollection<string> viewsFound)
+    /// <summary>
+    /// The controllers that were found in the assembly.
+    /// </summary>
+    internal IReadOnlyCollection<string> Controllers { get; }
+
+    internal SiteAssemblyInformation(IReadOnlyCollection<string> controllersFound, IReadOnlyCollection<CultureBasedView> viewsFound)
     {
-        ViewsFound = viewsFound ?? throw new ArgumentNullException(nameof(viewsFound));
-        ControllersFound = controllersFound ?? throw new ArgumentNullException(nameof(controllersFound));
+        Views = viewsFound ?? throw new ArgumentNullException(nameof(viewsFound));
+        Controllers = controllersFound ?? throw new ArgumentNullException(nameof(controllersFound));
     }
 }

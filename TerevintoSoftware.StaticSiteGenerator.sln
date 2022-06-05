@@ -10,12 +10,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{897D39EA-E404-4DC1-89AC-EAF056503860}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A0D5DA53-772B-4B7E-B220-C7C4227A0754}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerevintoSoftware.StaticSiteGenerator.Tests", "tests\TerevintoSoftware.StaticSiteGenerator.Tests\TerevintoSoftware.StaticSiteGenerator.Tests.csproj", "{5EF3C3F0-9031-4366-BACE-BDB5EB132A0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerevintoSoftware.StaticSiteGenerator.Tests", "tests\TerevintoSoftware.StaticSiteGenerator.Tests\TerevintoSoftware.StaticSiteGenerator.Tests.csproj", "{5EF3C3F0-9031-4366-BACE-BDB5EB132A0B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

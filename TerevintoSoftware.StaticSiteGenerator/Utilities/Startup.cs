@@ -7,10 +7,12 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Reflection;
 using TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
-using TerevintoSoftware.StaticSiteGenerator.Internal;
 using TerevintoSoftware.StaticSiteGenerator.Internal.Services;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
 using TerevintoSoftware.StaticSiteGenerator.Utilities;
+using TerevintoSoftware.StaticSiteGenerator.Services;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 namespace TerevintoSoftware.StaticSiteGenerator;
 
@@ -22,7 +24,7 @@ internal class Startup
     {
         _builder = WebApplication.CreateBuilder();
     }
-
+    private Func<double, double> _halfValue = value => value / 2;
     internal Startup ConfigureServices(StaticSiteGenerationOptions staticSiteOptions)
     {
         try
@@ -41,21 +43,34 @@ internal class Startup
                     c.SetMinimumLevel(LogLevel.Debug);
                 }
             });
+            
+            var siteAssemblyInformation = SiteAssemblyInformationFactory.GetAssemblyInformation(assembly, staticSiteOptions.DefaultCulture);
+            var cultures = GetUniqueCultures(staticSiteOptions, siteAssemblyInformation);
 
             _builder.Services
                 .AddControllersWithViews()
                 .AddApplicationPart(assembly)
-                .AddRazorRuntimeCompilation();
+                .AddRazorRuntimeCompilation()
+                .AddViewLocalization();
 
-            var endpointProvider = new EndpointProvider(staticSiteOptions);
+            if (cultures.Count > 1)
+            {
+                _builder.Services.AddRequestLocalization(opt =>
+                {
+                    opt.SupportedCultures = cultures;
+                    opt.SupportedUICultures = cultures;
+                    opt.DefaultRequestCulture = new RequestCulture(staticSiteOptions.DefaultCulture);
+                });
+            }
+
+            var endpointProvider = new EndpointProvider(staticSiteOptions, siteAssemblyInformation);
             endpointProvider.Inject(_builder.Services);
-
-            var siteAssemblyInformation = SiteAssemblyInformationFactory.GetAssemblyInformation(assembly);
             
             _builder.Services
                 .AddSingleton<IEndpointProvider>(endpointProvider)
                 .AddSingleton(staticSiteOptions)
                 .AddSingleton(siteAssemblyInformation)
+                .AddSingleton<IHtmlFormatter, HtmlFormatter>()
                 .AddSingleton<IUrlFormatter, UrlFormatter>()
                 .AddSingleton<IViewCompilerService, ViewCompilerService>()
                 .AddSingleton<IOrchestrator, Orchestrator>();
@@ -73,5 +88,16 @@ internal class Startup
         return _builder.Build();
     }
 
-
+    /// <summary>
+    /// Retrieves the unique cultures that were found by looking at Views in the assembly.
+    /// </summary>
+    private IList<CultureInfo> GetUniqueCultures(StaticSiteGenerationOptions staticSiteOptions, SiteAssemblyInformation siteAssemblyInformation)
+    {
+        return siteAssemblyInformation.Views
+            .SelectMany(v => v.Cultures)
+            .Prepend(staticSiteOptions.DefaultCulture)
+            .Distinct()
+            .Select(x => new CultureInfo(x))
+            .ToArray();
+    }
 }

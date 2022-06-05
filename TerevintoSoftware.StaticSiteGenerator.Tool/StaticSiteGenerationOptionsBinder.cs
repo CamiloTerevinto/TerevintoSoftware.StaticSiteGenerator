@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.RenderTree;
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.CommandLine.Binding;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
 
@@ -13,6 +12,8 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
     private readonly Option<string> _baseControllerOption;
     private readonly Option<string> _defaultRouteTemplateOption;
     private readonly Option<RouteCasing> _routeCasingOption;
+    private readonly Option<string> _defaultCultureOption;
+    private readonly Option<bool> _useLocalizationOption;
     private readonly Option<bool> _verboseOption;
 
     public StaticSiteGenerationOptionsBinder()
@@ -23,6 +24,8 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
         _baseControllerOption = BuildBaseControllerOption();
         _defaultRouteTemplateOption = BuildDefaultRouteTemplateOption();
         _routeCasingOption = BuildRouteCasingOption();
+        _defaultCultureOption = BuildDefaultCultureOption();
+        _useLocalizationOption = BuildUseLocalizationOption();
         _verboseOption = BuildVerboseOption();
     }
 
@@ -44,6 +47,8 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
         rootCommand.AddOption(binder._baseControllerOption);
         rootCommand.AddOption(binder._defaultRouteTemplateOption);
         rootCommand.AddOption(binder._routeCasingOption);
+        rootCommand.AddOption(binder._defaultCultureOption);
+        rootCommand.AddOption(binder._useLocalizationOption);
         rootCommand.AddOption(binder._verboseOption);
 
         rootCommand.SetHandler(async (StaticSiteGenerationOptions options) =>
@@ -89,10 +94,12 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
             bindingContext.ParseResult.GetValueForOption(_baseControllerOption)!,
             bindingContext.ParseResult.GetValueForOption(_defaultRouteTemplateOption)!,
             bindingContext.ParseResult.GetValueForOption(_routeCasingOption),
+            bindingContext.ParseResult.GetValueForOption(_defaultCultureOption),
+            bindingContext.ParseResult.GetValueForOption(_useLocalizationOption),
             bindingContext.ParseResult.GetValueForOption(_verboseOption));
     }
 
-    private Option<string> BuildProjectPathOption()
+    private static Option<string> BuildProjectPathOption()
     {
         var projectPathOption = new Option<string>(
             "--project",
@@ -122,7 +129,7 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
         return projectPathOption;
     }
 
-    private Option<string> BuildOutputPathOption()
+    private static Option<string> BuildOutputPathOption()
     {
         var outputPathOption = new Option<string>(
             "--output",
@@ -140,7 +147,7 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
                 {
                     Directory.Delete(outputPath, true);
                 }
-                
+
                 Directory.CreateDirectory(outputPath);
 
                 return outputPath;
@@ -193,8 +200,8 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
 
         return assemblyPathOption;
     }
-
-    private Option<string> BuildBaseControllerOption()
+    
+    private static Option<string> BuildBaseControllerOption()
     {
         var baseControllerOption = new Option<string>(
             "--base-controller",
@@ -204,7 +211,7 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
         return baseControllerOption;
     }
 
-    private Option<string> BuildDefaultRouteTemplateOption()
+    private static Option<string> BuildDefaultRouteTemplateOption()
     {
         var defaultRouteTemplateOption = new Option<string>(
             "--route-template",
@@ -214,7 +221,7 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
         return defaultRouteTemplateOption;
     }
 
-    private Option<RouteCasing> BuildRouteCasingOption()
+    private static Option<RouteCasing> BuildRouteCasingOption()
     {
         var routeNamingFormatOption = new Option<RouteCasing>(
             "--route-casing",
@@ -223,7 +230,7 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
 
         return routeNamingFormatOption;
     }
-    
+
     private static Option<bool> BuildVerboseOption()
     {
         var verboseOption = new Option<bool>(
@@ -232,5 +239,25 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
             description: "Enable verbose logging.");
 
         return verboseOption;
+    }
+
+    private static Option<string> BuildDefaultCultureOption()
+    {
+        var defaultCultureOption = new Option<string>(
+            "--default-culture",
+            () => "en",
+            description: "The default culture to use for the project.");
+
+        return defaultCultureOption;
+    }
+
+    private static Option<bool> BuildUseLocalizationOption()
+    {
+        var useLocalizationOption = new Option<bool>(
+            "--use-localization",
+            () => false,
+            description: "Enable localization for the project.");
+
+        return useLocalizationOption;
     }
 }
