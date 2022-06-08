@@ -1,5 +1,4 @@
 ﻿using HtmlAgilityPack;
-using TerevintoSoftware.StaticSiteGenerator.Internal.Services;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Services;
 
@@ -22,8 +21,14 @@ internal class HtmlFormatter : IHtmlFormatter
         var document = new HtmlDocument();
         document.LoadHtml(html);
 
-        // get links that start with /
+        // Get links that start with /
         var links = document.DocumentNode.SelectNodes("//a[starts-with(@href, '/')]");
+
+        // If there are no links to replace, just return the input
+        if (links == null)
+        {
+            return html;
+        }
 
         foreach (var link in links)
         {
@@ -37,8 +42,8 @@ internal class HtmlFormatter : IHtmlFormatter
         using var memoryStream = new MemoryStream();
         document.Save(memoryStream);
         memoryStream.Position = 0;
+        
         using var reader = new StreamReader(memoryStream);
-
         return reader.ReadToEnd();
     }
 }

@@ -6,9 +6,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using TerevintoSoftware.StaticSiteGenerator.Configuration;
 
 namespace TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
+
+internal interface IEndpointProvider
+{
+    Endpoint Endpoint { get; }
+    IEndpointAddressScheme<RouteValuesAddress> EndpointAddressScheme { get; }
+}
 
 /// <summary>
 /// This class is used to create an endpoint to be able to parse routes in the Razor code. 
@@ -20,16 +25,14 @@ namespace TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
 internal class EndpointProvider : IEndpointProvider, IAsyncDisposable
 {
     private readonly StaticSiteGenerationOptions _siteGenerationOptions;
-    private readonly SiteAssemblyInformation _siteAssemblyInformation;
     private WebApplication _app = default!;
 
     public Endpoint Endpoint { get; }
     public IEndpointAddressScheme<RouteValuesAddress> EndpointAddressScheme { get; }
 
-    public EndpointProvider(StaticSiteGenerationOptions siteGenerationOptions, SiteAssemblyInformation siteAssemblyInformation)
+    public EndpointProvider(StaticSiteGenerationOptions siteGenerationOptions)
     {
         _siteGenerationOptions = siteGenerationOptions;
-        _siteAssemblyInformation = siteAssemblyInformation;
         (Endpoint, EndpointAddressScheme) = Initialize();
     }
 

@@ -87,10 +87,14 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
 
     protected override StaticSiteGenerationOptions GetBoundValue(BindingContext bindingContext)
     {
+        var projectPath = bindingContext.ParseResult.GetValueForOption(_projectPathOption)!;
+        var assemblyPath = bindingContext.ParseResult.GetValueForOption(_relativeAssemblyPathOption) 
+            ?? AssemblyHelpers.GetDefaultRelativeAssemblyPath(projectPath);
+
         return new StaticSiteGenerationOptions(
-            bindingContext.ParseResult.GetValueForOption(_projectPathOption)!,
+            projectPath,
             bindingContext.ParseResult.GetValueForOption(_outputPathOption)!,
-            bindingContext.ParseResult.GetValueForOption(_relativeAssemblyPathOption),
+            assemblyPath,
             bindingContext.ParseResult.GetValueForOption(_baseControllerOption)!,
             bindingContext.ParseResult.GetValueForOption(_defaultRouteTemplateOption)!,
             bindingContext.ParseResult.GetValueForOption(_routeCasingOption),

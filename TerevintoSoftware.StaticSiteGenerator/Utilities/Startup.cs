@@ -1,21 +1,17 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Razor.Hosting;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
-using TerevintoSoftware.StaticSiteGenerator.Internal.Services;
-using TerevintoSoftware.StaticSiteGenerator.Configuration;
-using TerevintoSoftware.StaticSiteGenerator.Utilities;
 using TerevintoSoftware.StaticSiteGenerator.Services;
-using System.Globalization;
-using Microsoft.AspNetCore.Localization;
+using TerevintoSoftware.StaticSiteGenerator.Utilities;
 
 namespace TerevintoSoftware.StaticSiteGenerator;
 
+[ExcludeFromCodeCoverage] // There is no obvious way to unit test this
 internal class Startup
 {
     private readonly WebApplicationBuilder _builder;
@@ -24,7 +20,7 @@ internal class Startup
     {
         _builder = WebApplication.CreateBuilder();
     }
-    private Func<double, double> _halfValue = value => value / 2;
+
     internal Startup ConfigureServices(StaticSiteGenerationOptions staticSiteOptions)
     {
         try
@@ -37,15 +33,15 @@ internal class Startup
             _builder.Services.AddLogging(c =>
             {
                 c.AddConsole();
-                
+
                 if (staticSiteOptions.Verbose)
                 {
                     c.SetMinimumLevel(LogLevel.Debug);
                 }
             });
-            
+
             var siteAssemblyInformation = SiteAssemblyInformationFactory.GetAssemblyInformation(assembly, staticSiteOptions.DefaultCulture);
-            var cultures = GetUniqueCultures(staticSiteOptions, siteAssemblyInformation);
+            var cultures = CultureHelpers.GetUniqueCultures(staticSiteOptions, siteAssemblyInformation);
 
             _builder.Services
                 .AddControllersWithViews()
@@ -63,9 +59,9 @@ internal class Startup
                 });
             }
 
-            var endpointProvider = new EndpointProvider(staticSiteOptions, siteAssemblyInformation);
+            var endpointProvider = new EndpointProvider(staticSiteOptions);
             endpointProvider.Inject(_builder.Services);
-            
+
             _builder.Services
                 .AddSingleton<IEndpointProvider>(endpointProvider)
                 .AddSingleton(staticSiteOptions)
@@ -86,18 +82,5 @@ internal class Startup
     internal WebApplication Build()
     {
         return _builder.Build();
-    }
-
-    /// <summary>
-    /// Retrieves the unique cultures that were found by looking at Views in the assembly.
-    /// </summary>
-    private IList<CultureInfo> GetUniqueCultures(StaticSiteGenerationOptions staticSiteOptions, SiteAssemblyInformation siteAssemblyInformation)
-    {
-        return siteAssemblyInformation.Views
-            .SelectMany(v => v.Cultures)
-            .Prepend(staticSiteOptions.DefaultCulture)
-            .Distinct()
-            .Select(x => new CultureInfo(x))
-            .ToArray();
     }
 }

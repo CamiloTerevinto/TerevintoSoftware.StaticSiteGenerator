@@ -66,7 +66,7 @@ public class StaticSiteGenerationOptions
     /// <param name="defaultCulture">The default culture to use for rendering views.</param>
     /// <param name="useLocalization">Whether to enable localization for rendering views.</param>
     /// <param name="verbose">Whether to enable verbose logs.</param>
-    public StaticSiteGenerationOptions(string projectPath, string outputPath, string? relativeAssemblyPath, string baseController, 
+    public StaticSiteGenerationOptions(string projectPath, string outputPath, string relativeAssemblyPath, string baseController, 
         string defaultRoutePattern, RouteCasing routeCasing, string? defaultCulture, bool useLocalization, bool verbose)
     {
         if (string.IsNullOrWhiteSpace(projectPath))
@@ -79,29 +79,19 @@ public class StaticSiteGenerationOptions
             throw new ArgumentNullException(nameof(outputPath));
         }
 
+        if (string.IsNullOrWhiteSpace(relativeAssemblyPath))
+        {
+            throw new ArgumentNullException(nameof(relativeAssemblyPath));
+        }
+
         ProjectPath = projectPath;
         OutputPath = outputPath;
-        RelativeAssemblyPath = relativeAssemblyPath ?? GetDefaultRelativeAssemblyPath(projectPath);
+        RelativeAssemblyPath = relativeAssemblyPath;
         BaseController = baseController;
         DefaultRoutePattern = defaultRoutePattern;
         RouteCasing = routeCasing;
         DefaultCulture = defaultCulture ?? "en";
         UseLocalization = useLocalization;
         Verbose = verbose;
-    }
-
-    private static string GetDefaultRelativeAssemblyPath(string projectPath)
-    {
-        var separator = Path.DirectorySeparatorChar;
-
-        var relativeAssemblyPath = $"bin{separator}Debug{separator}net6.0{separator}{new DirectoryInfo(projectPath).Name}.dll";
-        var fullAssemblyPath = Path.Combine(projectPath, relativeAssemblyPath);
-        
-        if (File.Exists(fullAssemblyPath))
-        {
-            return relativeAssemblyPath;
-        }
-
-        throw new FileNotFoundException("Could not find compiled assembly.", fullAssemblyPath);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Models;
 
@@ -24,6 +25,7 @@ internal class ViewGenerationResult
         Failed = true;
     }
 
+    [ExcludeFromCodeCoverage]
     private string DebuggerDisplay => $"{OriginalViewName} => {(Failed ? "failed" : "generated")}";
 }
 

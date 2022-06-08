@@ -21,6 +21,7 @@ Read the README in the GitHub project for information on usage.  </Description>
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="TerevintoSoftware.StaticSiteGenerator.Tests" />
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
 		<None Include="..\README.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>

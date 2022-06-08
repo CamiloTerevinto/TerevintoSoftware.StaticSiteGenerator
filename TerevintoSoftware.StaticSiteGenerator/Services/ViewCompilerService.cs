@@ -1,43 +1,22 @@
-﻿using HtmlAgilityPack;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using System.Collections.Concurrent;
-using System.Globalization;
-using System.Text;
+﻿using System.Collections.Concurrent;
 using TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
 using TerevintoSoftware.StaticSiteGenerator.Models;
-using TerevintoSoftware.StaticSiteGenerator.Services;
 
-namespace TerevintoSoftware.StaticSiteGenerator.Internal.Services;
+namespace TerevintoSoftware.StaticSiteGenerator.Services;
 
 internal class ViewCompilerService : IViewCompilerService
 {
-    private readonly MvcViewOptions _viewOptions;
-    private readonly ITempDataProvider _tempDataProvider;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IEndpointProvider _endpointProvider;
-    private readonly IHtmlFormatter _htmlFormatter;
+    private readonly IViewRenderService _viewRenderService;
     private readonly StaticSiteGenerationOptions _staticSiteGenerationOptions;
+    private readonly IHtmlFormatter _htmlFormatter;
 
-    public ViewCompilerService(IOptions<MvcViewOptions> viewOptions, ITempDataProvider tempDataProvider,
-        IServiceProvider serviceProvider, IEndpointProvider endpointProvider, IHtmlFormatter htmlFormatter,
+    public ViewCompilerService(IViewRenderService viewRenderService, IHtmlFormatter htmlFormatter,
         StaticSiteGenerationOptions staticSiteGenerationOptions)
     {
-        _viewOptions = viewOptions.Value;
-        _tempDataProvider = tempDataProvider;
-        _serviceProvider = serviceProvider;
-        _endpointProvider = endpointProvider;
-        _htmlFormatter = htmlFormatter;
+        _viewRenderService = viewRenderService;
         _staticSiteGenerationOptions = staticSiteGenerationOptions;
+        _htmlFormatter = htmlFormatter;
     }
 
     public async Task<IEnumerable<ViewGenerationResult>> CompileViews(IEnumerable<CultureBasedView> viewsToRender)
@@ -63,7 +42,7 @@ internal class ViewCompilerService : IViewCompilerService
 
             try
             {
-                var html = await GetCompiledView(viewName, culture);
+                var html = await _viewRenderService.GetCompiledView(viewName, culture);
 
                 html = _htmlFormatter.FixRelativeLinks(html, culture);
 
@@ -80,49 +59,5 @@ internal class ViewCompilerService : IViewCompilerService
 #endif
 
         return bag.ToArray();
-    }
-
-    private async Task<string> GetCompiledView(string viewName, string? culture)
-    {
-        using var scope = _serviceProvider.CreateScope();
-        var context = new DefaultHttpContext
-        {
-            RequestServices = scope.ServiceProvider
-        };
-        context.SetEndpoint(_endpointProvider.Endpoint);
-        var routeData = context.GetRouteData();
-
-        var cultureInfo = new CultureInfo(culture ?? _staticSiteGenerationOptions.DefaultCulture);
-        Thread.CurrentThread.CurrentCulture = cultureInfo;
-        Thread.CurrentThread.CurrentUICulture = cultureInfo;
-        
-        var actionContext = new ActionContext(context, routeData, new ActionDescriptor());
-
-        var viewEngine = _viewOptions.ViewEngines.First();
-        var htmlHelperOptions = _viewOptions.HtmlHelperOptions;
-
-        var view = viewEngine.FindView(actionContext, viewName, true).View;
-
-        if (view == null)
-        {
-            throw new InvalidOperationException($"Unable to find view '{viewName}'");
-        }
-
-        var builder = new StringBuilder();
-
-        using (var output = new StringWriter(builder))
-        {
-            var viewContext = new ViewContext(
-                actionContext,
-                view,
-                new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()),
-                new TempDataDictionary(actionContext.HttpContext, _tempDataProvider),
-                output,
-                htmlHelperOptions);
-
-            await view.RenderAsync(viewContext);
-        }
-
-        return builder.ToString();
     }
 }

@@ -1,7 +1,7 @@
 ﻿using TerevintoSoftware.StaticSiteGenerator.Configuration;
 using TerevintoSoftware.StaticSiteGenerator.Utilities;
 
-namespace TerevintoSoftware.StaticSiteGenerator.Internal.Services;
+namespace TerevintoSoftware.StaticSiteGenerator.Services;
 
 internal interface IUrlFormatter
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TerevintoSoftware.StaticSiteGenerator.Internal.Services;
 using TerevintoSoftware.StaticSiteGenerator.Models;
+using TerevintoSoftware.StaticSiteGenerator.Services;
 
 namespace TerevintoSoftware.StaticSiteGenerator;
 

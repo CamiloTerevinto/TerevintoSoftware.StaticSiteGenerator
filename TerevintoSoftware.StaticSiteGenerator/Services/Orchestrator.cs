@@ -2,7 +2,7 @@
 using TerevintoSoftware.StaticSiteGenerator.Models;
 using TerevintoSoftware.StaticSiteGenerator.Utilities;
 
-namespace TerevintoSoftware.StaticSiteGenerator.Internal.Services;
+namespace TerevintoSoftware.StaticSiteGenerator.Services;
 
 internal class Orchestrator : IOrchestrator
 {
@@ -48,7 +48,7 @@ internal class Orchestrator : IOrchestrator
                 continue;
             }
 
-            string staticViewPath = GetNewViewPath(baseControllerPath, generationResult);
+            var staticViewPath = GetNewViewPath(baseControllerPath, generationResult);
 
             if (!Directory.Exists(Path.GetDirectoryName(staticViewPath)))
             {
@@ -58,11 +58,11 @@ internal class Orchestrator : IOrchestrator
             var view = generationResult.GeneratedView!;
 
             File.WriteAllText(staticViewPath, view.GeneratedHtml);
-            
+
             // If this is the main/default view and also the default language,
             // we copy the file again as just /index.html, so it can serve as an entry point
             // for hosting providers that asks for an index.html at the root
-            if (_staticSiteOptions.UseLocalization && 
+            if (_staticSiteOptions.UseLocalization &&
                 generationResult.OriginalViewName.ToLower() == $"{_staticSiteOptions.BaseController.ToLower()}/index" &&
                 view.Culture == _staticSiteOptions.DefaultCulture)
             {

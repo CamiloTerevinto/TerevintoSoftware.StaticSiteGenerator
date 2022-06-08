@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Configuration;
 
@@ -8,6 +9,7 @@ namespace TerevintoSoftware.StaticSiteGenerator.Configuration;
 [DebuggerDisplay("{DebuggerDisplay}")]
 internal class CultureBasedView
 {
+    [ExcludeFromCodeCoverage]
     private string DebuggerDisplay => $"{ViewName}. Cultures: {Cultures.Count}";
 
     /// <summary>
@@ -19,12 +21,6 @@ internal class CultureBasedView
     /// The list of cultures to use to generate the view. For example: en-GB, es, fr-FR.
     /// </summary>
     public IReadOnlyCollection<string> Cultures { get; }
-    
-    public CultureBasedView(string viewName, string defaultCulture)
-    {
-        ViewName = viewName;
-        Cultures = new[] { defaultCulture };
-    }
 
     public CultureBasedView(string viewName, IReadOnlyCollection<string> cultures)
     {
