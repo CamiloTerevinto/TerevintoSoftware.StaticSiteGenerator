@@ -1,4 +1,5 @@
 # Static Site Generator
+[![Coverage Status](https://coveralls.io/repos/github/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator/badge.svg?branch=main)](https://coveralls.io/github/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator?branch=main) [![Nuget version](https://img.shields.io/nuget/v/TerevintoSoftware.StaticSiteGenerator.Tool)](https://www.nuget.org/packages/TerevintoSoftware.StaticSiteGenerator.Tool/)
 
 This project aims to provide a way for c# developers to benefit from very cheap/free hosting through static files, 
 while allowing them to use familiar ASP.NET MVC concepts (Views, Partials, Layouts, etc).
