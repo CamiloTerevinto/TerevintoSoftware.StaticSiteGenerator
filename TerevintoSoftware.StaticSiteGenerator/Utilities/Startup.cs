@@ -40,7 +40,9 @@ internal class Startup
                 }
             });
 
-            var siteAssemblyInformation = SiteAssemblyInformationFactory.GetAssemblyInformation(assembly, staticSiteOptions.DefaultCulture);
+            var exportedTypes = assembly.GetExportedTypes();
+            var customAttributes = assembly.GetCustomAttributes();
+            var siteAssemblyInformation = SiteAssemblyInformationFactory.GetAssemblyInformation(exportedTypes, customAttributes, staticSiteOptions.DefaultCulture);
             var cultures = CultureHelpers.GetUniqueCultures(staticSiteOptions, siteAssemblyInformation);
 
             _builder.Services

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Razor.Hosting;
+using System.Globalization;
 using System.Reflection;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
 
@@ -8,38 +9,29 @@ namespace TerevintoSoftware.StaticSiteGenerator.Utilities;
 
 internal static class SiteAssemblyInformationFactory
 {
-    internal static SiteAssemblyInformation GetAssemblyInformation(Assembly assembly, string defaultCulture)
+    internal static SiteAssemblyInformation GetAssemblyInformation(IEnumerable<Type> exportedTypes, IEnumerable<Attribute> customAttributes, string defaultCulture)
     {
-        var exportedTypes = assembly.GetExportedTypes();
-        var customAttributes = assembly.GetCustomAttributes();
-        var controllersFound = FindControllerNames(exportedTypes);
+        var controllersNames = GetControllerNames(exportedTypes);
         var views = GetViewCultures(exportedTypes, customAttributes, defaultCulture);
 
-        return new SiteAssemblyInformation(controllersFound, views);
+        return new SiteAssemblyInformation(controllersNames, views);
     }
 
     private static IReadOnlyCollection<CultureBasedView> GetViewCultures(IEnumerable<Type> exportedTypes, IEnumerable<Attribute> customAttributes, string defaultCulture)
     {
         var views = FindViews(exportedTypes, customAttributes);
-        
+
         return views.Select(viewName =>
         {
             // The viewName does not have the .cshtml extension at this point,
             // so we can assume that a dot is for a specific culture.
             var parts = viewName.Split('.');
 
-            if (parts.Length == 1)
+            if (parts.Length == 1 || parts.Length > 2)
             {
                 return (viewName, defaultCulture);
             }
-
-            // If the file has a dot, and the part after the dot has a length of 2 or 5, it's probably a culture.
-            // Valid culture examples: Index.es, Index.es-ES, Index.en-US.
-            if (parts[1].Length != 2 && parts[1].Length != 5)
-            {
-                return (viewName, defaultCulture);
-            }
-
+            
             return (parts[0], parts[1]);
         })
             .GroupBy(x => x.Item1)
@@ -47,40 +39,7 @@ internal static class SiteAssemblyInformationFactory
             .ToArray();
     }
 
-    private static string[] FindActionRoutes(IEnumerable<Type> exportedTypes)
-    {
-        return FindControllerTypes(exportedTypes)
-            .SelectMany(controllerType => controllerType
-                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(method => method.ReturnType == typeof(IActionResult))
-                .Select(method =>
-                {
-                    // If the action has a templated route, use that.
-                    var template = method.GetCustomAttribute<RouteAttribute>()?.Template ??
-                                   method.GetCustomAttribute<HttpGetAttribute>()?.Template;
-
-                    if (!string.IsNullOrEmpty(template))
-                    {
-                        if (template.StartsWith("/", StringComparison.Ordinal))
-                        {
-                            template = template[1..];
-                        }
-
-                        return template;
-                    }
-
-                    // Otherwise, use the controller's and the action's name.
-
-                    var controllerName = controllerType.Name;
-                    var controller = controllerName.EndsWith("Controller") ? controllerName[..^10] : controllerName;
-                    var action = method.Name;
-
-                    return $"{controller}/{action}";
-                }))
-            .ToArray();
-    }
-
-    private static IReadOnlyCollection<string> FindControllerNames(IEnumerable<Type> exportedTypes)
+    private static IReadOnlyCollection<string> GetControllerNames(IEnumerable<Type> exportedTypes)
     {
         return FindControllerTypes(exportedTypes)
             .Select(x =>
@@ -105,7 +64,7 @@ internal static class SiteAssemblyInformationFactory
     private static IEnumerable<string> FindViews(IEnumerable<Type> exportedTypes, IEnumerable<Attribute> customAttributes)
     {
         var nonModelViewBaseType = typeof(RazorPage<object>);
-        var actionRoutes = FindActionRoutes(exportedTypes);
+        var actionRoutes = GetActionRoutes(exportedTypes);
 
         return customAttributes
             .OfType<RazorCompiledItemAttribute>()
@@ -124,13 +83,13 @@ internal static class SiteAssemblyInformationFactory
                     var viewPath = $"/Views/{v}";
                     var viewFilename = $"{viewPath}.cshtml";
 
-                    if (viewFilename == x.Identifier)
+                    if (viewFilename.Equals(x.Identifier, StringComparison.CurrentCultureIgnoreCase))
                     {
                         return true;
                     }
 
                     // For example: /Views/Home/Index.es.cshtml => represents a localized view
-                    if (x.Identifier.StartsWith(viewPath + ".") && x.Identifier.EndsWith(".cshtml"))
+                    if (x.Identifier.StartsWith(viewPath + ".") && x.Identifier.EndsWith(".cshtml", StringComparison.CurrentCultureIgnoreCase))
                     {
                         return true;
                     }
@@ -151,6 +110,43 @@ internal static class SiteAssemblyInformationFactory
                 }
 
                 return identifier;
-            });
+            })
+            .ToArray();
     }
+
+    private static string[] GetActionRoutes(IEnumerable<Type> exportedTypes)
+    {
+        return FindControllerTypes(exportedTypes)
+            .SelectMany(controllerType => controllerType
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .Where(method => method.ReturnType == typeof(IActionResult))
+                .Select(method =>
+                {
+                    var controllerName = controllerType.Name;
+                    var controller = controllerName.EndsWith("Controller") ? controllerName[..^10] : controllerName;
+                    
+                    var template = method.GetCustomAttribute<RouteAttribute>()?.Template ??
+                                   method.GetCustomAttribute<HttpGetAttribute>()?.Template;
+                    
+                    // If the action has a templated route, use that.
+                    if (!string.IsNullOrEmpty(template))
+                    {
+                        if (template.StartsWith("/", StringComparison.Ordinal))
+                        {
+                            return template[1..];
+                        }
+                        
+                        return $"{controller}/{template}";
+                    }
+
+                    // Otherwise, use the controller's and the action's name.
+
+                    
+                    var action = method.Name;
+
+                    return $"{controller}/{action}";
+                }))
+            .ToArray();
+    }
+
 }
