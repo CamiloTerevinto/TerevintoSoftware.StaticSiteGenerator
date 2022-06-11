@@ -71,6 +71,8 @@ internal class Startup
                 .AddSingleton<IHtmlFormatter, HtmlFormatter>()
                 .AddSingleton<IUrlFormatter, UrlFormatter>()
                 .AddSingleton<IViewCompilerService, ViewCompilerService>()
+                .AddSingleton<IViewRenderService, ViewRenderService>()
+                .AddSingleton<IActionContextFactory, ActionContextFactory>()
                 .AddSingleton<IOrchestrator, Orchestrator>();
 
             return this;

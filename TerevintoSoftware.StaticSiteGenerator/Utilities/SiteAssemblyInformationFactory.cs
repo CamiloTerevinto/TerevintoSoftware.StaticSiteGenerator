@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Razor.Hosting;
-using System.Globalization;
 using System.Reflection;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
 
@@ -31,7 +30,7 @@ internal static class SiteAssemblyInformationFactory
             {
                 return (viewName, defaultCulture);
             }
-            
+
             return (parts[0], parts[1]);
         })
             .GroupBy(x => x.Item1)
@@ -124,10 +123,10 @@ internal static class SiteAssemblyInformationFactory
                 {
                     var controllerName = controllerType.Name;
                     var controller = controllerName.EndsWith("Controller") ? controllerName[..^10] : controllerName;
-                    
+
                     var template = method.GetCustomAttribute<RouteAttribute>()?.Template ??
                                    method.GetCustomAttribute<HttpGetAttribute>()?.Template;
-                    
+
                     // If the action has a templated route, use that.
                     if (!string.IsNullOrEmpty(template))
                     {
@@ -135,13 +134,13 @@ internal static class SiteAssemblyInformationFactory
                         {
                             return template[1..];
                         }
-                        
+
                         return $"{controller}/{template}";
                     }
 
                     // Otherwise, use the controller's and the action's name.
 
-                    
+
                     var action = method.Name;
 
                     return $"{controller}/{action}";

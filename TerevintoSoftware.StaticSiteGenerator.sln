@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A0D5DA53
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerevintoSoftware.StaticSiteGenerator.Tests", "tests\TerevintoSoftware.StaticSiteGenerator.Tests\TerevintoSoftware.StaticSiteGenerator.Tests.csproj", "{5EF3C3F0-9031-4366-BACE-BDB5EB132A0B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWebsite", "tests\SampleWebsite\SampleWebsite.csproj", "{F3B600D3-205B-43AD-A1B3-5325F42DA648}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,12 +38,17 @@ Global
 		{5EF3C3F0-9031-4366-BACE-BDB5EB132A0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EF3C3F0-9031-4366-BACE-BDB5EB132A0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5EF3C3F0-9031-4366-BACE-BDB5EB132A0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3B600D3-205B-43AD-A1B3-5325F42DA648}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3B600D3-205B-43AD-A1B3-5325F42DA648}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3B600D3-205B-43AD-A1B3-5325F42DA648}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3B600D3-205B-43AD-A1B3-5325F42DA648}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5EF3C3F0-9031-4366-BACE-BDB5EB132A0B} = {A0D5DA53-772B-4B7E-B220-C7C4227A0754}
+		{F3B600D3-205B-43AD-A1B3-5325F42DA648} = {A0D5DA53-772B-4B7E-B220-C7C4227A0754}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C39B3F23-8EE4-4CF4-BB03-96C4E9E6228D}

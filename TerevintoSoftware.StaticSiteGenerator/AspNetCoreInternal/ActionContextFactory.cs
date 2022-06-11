@@ -24,7 +24,7 @@ internal class ActionContextFactory : IActionContextFactory
 
     public ActionContext Create()
     {
-        using var scope = _serviceScopeFactory.CreateScope();
+        var scope = _serviceScopeFactory.CreateScope();
         var httpContext = new DefaultHttpContext
         {
             RequestServices = scope.ServiceProvider

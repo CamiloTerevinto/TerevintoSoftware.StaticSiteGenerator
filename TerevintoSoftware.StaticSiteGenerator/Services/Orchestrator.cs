@@ -20,6 +20,15 @@ internal class Orchestrator : IOrchestrator
 
     public async Task<StaticSiteGenerationResult> BuildStaticFilesAsync()
     {
+        var destination = _staticSiteOptions.OutputPath;
+
+        if (Directory.Exists(destination))
+        {
+            Directory.Delete(destination, true);
+        }
+
+        Directory.CreateDirectory(destination);
+
         var viewsTask = GenerateViewsAsync();
         var assetsTask = Task.Run(CopyStaticAssets);
 
