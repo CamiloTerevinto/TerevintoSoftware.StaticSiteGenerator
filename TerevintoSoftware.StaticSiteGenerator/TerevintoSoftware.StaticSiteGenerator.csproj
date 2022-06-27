@@ -12,10 +12,11 @@
 		<RepositoryUrl>https://github.com/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator</RepositoryUrl>
 		<Description>A package for creating Static Websites (HTML+CSS+JavaScript) from ASP.NET Core MVC views.
 Read the README in the GitHub project for information on usage.  </Description>
-		<PackageReleaseNotes>[1.2.1]: Internal re-archicture and improve code coverage to over 90%.
+		<PackageReleaseNotes>[1.2.2]: Fixes an issue where a single culture always generated structures/links as if there were multiple cultures.
+[1.2.1]: Internal re-archicture and improve code coverage to over 90%.
 [1.2.0]: Adds an initial implementation for path-based views based on culture.
 [1.1.1]: Fixes a URL generation bug for the default Controller actions. Previous versions were deprecated as unstable.</PackageReleaseNotes>
-		<Version>1.2.1</Version>
+		<Version>1.2.2</Version>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<Copyright>Camilo Terevinto</Copyright>
 	</PropertyGroup>

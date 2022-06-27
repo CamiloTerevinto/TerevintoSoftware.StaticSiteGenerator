@@ -14,18 +14,19 @@ public class HtmlFormatterTests
     {
         var htmlFormatter = new HtmlFormatter(_urlFormatterMock.Object);
         
-        var outputUrl = htmlFormatter.FixRelativeLinks(inputHtml, "en");
+        var outputUrl = htmlFormatter.FixRelativeLinks(inputHtml, "en", "en");
         Assert.That(outputUrl, Is.EqualTo(expectedOutputHtml));
     }
     
-    [TestCase("<html><body><a href=\"/Index\">link</a></body></html>", "<html><body><a href=\"/en/index.html\">link</a></body></html>")]
-    public void FixRelativeLinks_WithLocalLinks_ShouldReplaceTheLinks(string inputHtml, string expectedOutputHtml)
+    [TestCase("<html><body><a href=\"/Index\">link</a></body></html>", "en", "en", "<html><body><a href=\"/index.html\">link</a></body></html>")]
+    [TestCase("<html><body><a href=\"/Index\">link</a></body></html>", "en", "es", "<html><body><a href=\"/es/index.html\">link</a></body></html>")]
+    public void FixRelativeLinks_WithLocalLinks_ShouldReplaceTheLinksWithAppropriateCulture(string inputHtml, string defaultCulture, string currentCulture, string expectedOutputHtml)
     {
         _urlFormatterMock.Setup(x => x.Format("/Index")).Returns("/index.html");
 
         var htmlFormatter = new HtmlFormatter(_urlFormatterMock.Object);
 
-        var outputUrl = htmlFormatter.FixRelativeLinks(inputHtml, "en");
+        var outputUrl = htmlFormatter.FixRelativeLinks(inputHtml, defaultCulture, currentCulture);
         Assert.That(outputUrl, Is.EqualTo(expectedOutputHtml));
     }
 }

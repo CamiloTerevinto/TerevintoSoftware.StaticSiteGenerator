@@ -6,7 +6,7 @@ namespace TerevintoSoftware.StaticSiteGenerator.Tests.IntegrationTests;
 public class GenerateStaticWebsiteTest
 {
     [Test]
-    public void GenerateStaticWebsite()
+    public async Task GenerateStaticWebsite()
     {
         var testContext = TestContext.CurrentContext;
         var testDirectory = new DirectoryInfo(testContext.TestDirectory); 
@@ -18,12 +18,14 @@ public class GenerateStaticWebsiteTest
         var options = new StaticSiteGenerationOptions(projectPath, outputPath, assemblyPath, "Home", 
             "{controller=Home}/{action=Index}/{id?}", RouteCasing.LowerCase, "en", false, false);
 
-        var result = StaticSiteBuilder.GenerateStaticSite(options).Result;
+        var result = await StaticSiteBuilder.GenerateStaticSite(options);
         
         Assert.Multiple(() =>
         {
-            Assert.That(result.ViewsCompiled, Has.Count.EqualTo(2));
             Assert.That(result.Errors, Is.Empty);
+            Assert.That(result.ViewsCompiled, Has.Count.EqualTo(2));
+            Assert.That(result.ViewsCompiled.SingleOrDefault(x => x == "View Home/Index => index.html"), Is.Not.Null);
+            Assert.That(result.ViewsCompiled.SingleOrDefault(x => x == "View Home/Privacy => privacy.html"), Is.Not.Null);
         });
     }
 }

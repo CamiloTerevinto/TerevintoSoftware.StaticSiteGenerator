@@ -4,7 +4,7 @@ namespace TerevintoSoftware.StaticSiteGenerator.Services;
 
 internal interface IHtmlFormatter
 {
-    string FixRelativeLinks(string html, string culture);
+    string FixRelativeLinks(string html, string defaultCulture, string currentCulture);
 }
 
 internal class HtmlFormatter : IHtmlFormatter
@@ -16,7 +16,7 @@ internal class HtmlFormatter : IHtmlFormatter
         _urlFormatter = urlFormatter;
     }
 
-    public string FixRelativeLinks(string html, string culture)
+    public string FixRelativeLinks(string html, string defaultCulture, string currentCulture)
     {
         var document = new HtmlDocument();
         document.LoadHtml(html);
@@ -36,7 +36,14 @@ internal class HtmlFormatter : IHtmlFormatter
 
             var formattedUrl = _urlFormatter.Format(href);
 
-            link.Attributes["href"].Value = $"/{culture}{formattedUrl}";
+            if (defaultCulture != currentCulture)
+            {
+                link.Attributes["href"].Value = $"/{currentCulture}{formattedUrl}";
+            }
+            else
+            {
+                link.Attributes["href"].Value = $"{formattedUrl}";
+            }
         }
 
         using var memoryStream = new MemoryStream();

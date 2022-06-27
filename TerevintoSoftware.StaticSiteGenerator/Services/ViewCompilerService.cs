@@ -31,22 +31,22 @@ internal class ViewCompilerService : IViewCompilerService
         await Parallel.ForEachAsync(views, async (view, ct) =>
 #endif
         {
-            var (viewNameWithoutCulture, culture) = view;
+            var (viewNameWithoutCulture, currentCulture) = view;
 
             var viewName = viewNameWithoutCulture;
 
-            if (culture != _staticSiteGenerationOptions.DefaultCulture)
+            if (currentCulture != _staticSiteGenerationOptions.DefaultCulture)
             {
-                viewName += "." + culture;
+                viewName += "." + currentCulture;
             }
 
             try
             {
-                var html = await _viewRenderService.GetCompiledView(viewName, culture);
+                var html = await _viewRenderService.GetCompiledView(viewName, currentCulture);
 
-                html = _htmlFormatter.FixRelativeLinks(html, culture);
+                html = _htmlFormatter.FixRelativeLinks(html, _staticSiteGenerationOptions.DefaultCulture, currentCulture);
 
-                bag.Add(new ViewGenerationResult(viewName, new GeneratedView(viewNameWithoutCulture + ".html", html, culture)));
+                bag.Add(new ViewGenerationResult(viewName, new GeneratedView(viewNameWithoutCulture + ".html", html, currentCulture)));
             }
             catch (Exception ex)
             {

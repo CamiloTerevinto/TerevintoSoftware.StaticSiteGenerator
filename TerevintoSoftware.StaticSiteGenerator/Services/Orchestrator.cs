@@ -93,7 +93,7 @@ internal class Orchestrator : IOrchestrator
             generatedName = generatedName[baseControllerPath.Length..];
         }
 
-        if (generationResult.GeneratedView.Culture != null)
+        if (generationResult.GeneratedView.Culture != null && _staticSiteOptions.UseLocalization)
         {
             generatedName = $"{generationResult.GeneratedView.Culture}/{generatedName}";
         }
