@@ -9,7 +9,7 @@ public class CultureHelperTests
     [Test]
     public void GetUniqueCultures_ShouldReturnCulturesFoundAndDefault()
     {
-        var staticSiteGenerationOptions = new StaticSiteGenerationOptions("test", "test", "test", "Home", "en", RouteCasing.LowerCase, null, false, false);
+        var staticSiteGenerationOptions = new StaticSiteGenerationOptions("test", "test", "test", "Home", "en", RouteCasing.LowerCase, null, false, true, false);
         var siteAssemblyInformation = new SiteAssemblyInformation(new List<string>(), new List<CultureBasedView>
         {
             new CultureBasedView("Home", new[] { "es" })

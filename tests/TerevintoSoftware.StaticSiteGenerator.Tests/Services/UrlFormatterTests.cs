@@ -8,9 +8,9 @@ namespace TerevintoSoftware.StaticSiteGenerator.Tests.Services;
 public class UrlFormatterTests
 {
     private readonly SiteAssemblyInformation _siteAssemblyInformation = new(new[] { "Home", "Blog" }, Array.Empty<CultureBasedView>());
-    private readonly StaticSiteGenerationOptions _lowerCaseOptions = new("test", "test", "test", "Home", "", RouteCasing.LowerCase, null, false, false);
-    private readonly StaticSiteGenerationOptions _kebabCaseOptions = new("test", "test", "test", "Home", "", RouteCasing.KebabCase, null, false, false);
-    private readonly StaticSiteGenerationOptions _keepCaseOptions = new("test", "test", "test", "Home", "", RouteCasing.KeepOriginal, null, false, false);
+    private readonly StaticSiteGenerationOptions _lowerCaseOptions = new("test", "test", "test", "Home", "", RouteCasing.LowerCase, null, false, true, false);
+    private readonly StaticSiteGenerationOptions _kebabCaseOptions = new("test", "test", "test", "Home", "", RouteCasing.KebabCase, null, false, true, false);
+    private readonly StaticSiteGenerationOptions _keepCaseOptions = new("test", "test", "test", "Home", "", RouteCasing.KeepOriginal, null, false, true, false);
 
     [TestCase("/", "/index.html")]
     [TestCase("/Blog", "/blog/index.html")]

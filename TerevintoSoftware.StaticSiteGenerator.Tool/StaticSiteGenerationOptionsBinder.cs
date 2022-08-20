@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Binding;
+using System.CommandLine.Invocation;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Tool;
@@ -15,6 +16,7 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
     private readonly Option<string> _defaultCultureOption;
     private readonly Option<bool> _useLocalizationOption;
     private readonly Option<bool> _verboseOption;
+    private readonly Option<bool> _clearExistingOutput;
 
     public StaticSiteGenerationOptionsBinder()
     {
@@ -27,6 +29,7 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
         _defaultCultureOption = BuildDefaultCultureOption();
         _useLocalizationOption = BuildUseLocalizationOption();
         _verboseOption = BuildVerboseOption();
+        _clearExistingOutput = BuildClearExistingOutputOption();
     }
 
     internal static RootCommand BuildRootCommand()
@@ -50,45 +53,23 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
         rootCommand.AddOption(binder._defaultCultureOption);
         rootCommand.AddOption(binder._useLocalizationOption);
         rootCommand.AddOption(binder._verboseOption);
-
-        rootCommand.SetHandler(async (StaticSiteGenerationOptions options) =>
-        {
-            Console.WriteLine("Processing started...");
-            var result = await StaticSiteBuilder.GenerateStaticSite(options);
-
-            Console.WriteLine("Processing completed.");
-            Console.WriteLine($"Generated {result.ViewsCompiled.Count} files:");
-
-            foreach (var view in result.ViewsCompiled)
-            {
-                Console.WriteLine($"-> {view}");
-            }
-
-            if (result.Errors.Count > 0)
-            {
-                Console.WriteLine();
-                Console.WriteLine("Errors:");
-
-                foreach (var error in result.Errors)
-                {
-                    Console.WriteLine($"-> {error}");
-                }
-
-                if (!options.Verbose)
-                {
-                    Console.WriteLine();
-                    Console.WriteLine("Use --verbose to see detailed errors.");
-                }
-            }
-        }, binder);
+        rootCommand.AddOption(binder._clearExistingOutput);
+        rootCommand.SetHandler(context => GenerateSiteInternal(context, binder.GetBoundValue(context.BindingContext)));
 
         return rootCommand;
+    }
+
+    private static async Task GenerateSiteInternal(InvocationContext context, StaticSiteGenerationOptions options)
+    {
+        var result = await StaticSiteBuilder.GenerateStaticSite(options, writeOutputLogs: true);
+
+        context.ExitCode = result.Errors.Count == 0 ? 0 : 1;
     }
 
     protected override StaticSiteGenerationOptions GetBoundValue(BindingContext bindingContext)
     {
         var projectPath = bindingContext.ParseResult.GetValueForOption(_projectPathOption)!;
-        var assemblyPath = bindingContext.ParseResult.GetValueForOption(_relativeAssemblyPathOption) 
+        var assemblyPath = bindingContext.ParseResult.GetValueForOption(_relativeAssemblyPathOption)
             ?? AssemblyHelpers.GetDefaultRelativeAssemblyPath(projectPath);
 
         return new StaticSiteGenerationOptions(
@@ -100,6 +81,7 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
             bindingContext.ParseResult.GetValueForOption(_routeCasingOption),
             bindingContext.ParseResult.GetValueForOption(_defaultCultureOption),
             bindingContext.ParseResult.GetValueForOption(_useLocalizationOption),
+            bindingContext.ParseResult.GetValueForOption(_clearExistingOutput),
             bindingContext.ParseResult.GetValueForOption(_verboseOption));
     }
 
@@ -204,7 +186,7 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
 
         return assemblyPathOption;
     }
-    
+
     private static Option<string> BuildBaseControllerOption()
     {
         var baseControllerOption = new Option<string>(
@@ -261,6 +243,16 @@ internal class StaticSiteGenerationOptionsBinder : BinderBase<StaticSiteGenerati
             "--use-localization",
             () => false,
             description: "Enable localization for the project.");
+
+        return useLocalizationOption;
+    }
+
+    private static Option<bool> BuildClearExistingOutputOption()
+    {
+        var useLocalizationOption = new Option<bool>(
+            "--clear-output",
+            () => true,
+            description: "Whether to delete the output folder, if it exists.");
 
         return useLocalizationOption;
     }

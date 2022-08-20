@@ -14,10 +14,11 @@ public class StaticSiteGenerationOptionsTests
         var defaultRoutePattern = "{controller}/{action}/{id?}";
         var routeCasing = RouteCasing.LowerCase;
         var defaultCulture = "en";
-        bool useLocalization = false;
-        bool verbose = false;
+        var useLocalization = false;
+        var clearExistingOutput = true;
+        var verbose = false;
 
-        Assert.That(() => new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, verbose), Throws.ArgumentNullException);
+        Assert.That(() => new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, clearExistingOutput, verbose), Throws.ArgumentNullException);
     }
 
     [Test]
@@ -31,9 +32,10 @@ public class StaticSiteGenerationOptionsTests
         var routeCasing = RouteCasing.LowerCase;
         var defaultCulture = "en";
         bool useLocalization = false;
+        var clearExistingOutput = true;
         bool verbose = false;
 
-        Assert.That(() => new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, verbose), Throws.ArgumentNullException);
+        Assert.That(() => new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, clearExistingOutput, verbose), Throws.ArgumentNullException);
     }
 
     [Test]
@@ -47,9 +49,10 @@ public class StaticSiteGenerationOptionsTests
         var routeCasing = RouteCasing.LowerCase;
         var defaultCulture = "en";
         bool useLocalization = false;
+        var clearExistingOutput = true;
         bool verbose = false;
 
-        Assert.That(() => new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, verbose), Throws.ArgumentNullException);
+        Assert.That(() => new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, clearExistingOutput, verbose), Throws.ArgumentNullException);
     }
 
     [Test]
@@ -63,9 +66,10 @@ public class StaticSiteGenerationOptionsTests
         var routeCasing = RouteCasing.LowerCase;
         var defaultCulture = (string)null!;
         bool useLocalization = false;
+        var clearExistingOutput = true;
         bool verbose = false;
 
-        var options = new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, verbose);
+        var options = new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, clearExistingOutput, verbose);
 
         Assert.That(options.DefaultCulture, Is.EqualTo("en"));
     }
@@ -81,9 +85,10 @@ public class StaticSiteGenerationOptionsTests
         var routeCasing = RouteCasing.LowerCase;
         var defaultCulture = "en";
         bool useLocalization = false;
+        var clearExistingOutput = true;
         bool verbose = false;
 
-        var options = new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, verbose);
+        var options = new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, clearExistingOutput, verbose);
 
         Assert.That(options.AssemblyPath, Is.EqualTo(Path.Combine(projectPath, relativeAssemblyPath)));
     }
@@ -99,9 +104,10 @@ public class StaticSiteGenerationOptionsTests
         var routeCasing = RouteCasing.LowerCase;
         var defaultCulture = "en";
         bool useLocalization = false;
+        var clearExistingOutput = true;
         bool verbose = false;
 
-        var options = new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, verbose);
+        var options = new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, clearExistingOutput, verbose);
         
         Assert.Multiple(() =>
         {
@@ -114,6 +120,7 @@ public class StaticSiteGenerationOptionsTests
             Assert.That(options.DefaultCulture, Is.EqualTo(defaultCulture));
             Assert.That(options.UseLocalization, Is.EqualTo(useLocalization));
             Assert.That(options.Verbose, Is.EqualTo(verbose));
+            Assert.That(options.ClearExistingOutput, Is.EqualTo(clearExistingOutput));
         });
     }
 }

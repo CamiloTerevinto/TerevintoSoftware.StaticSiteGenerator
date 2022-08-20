@@ -1,13 +1,6 @@
 ﻿using System.CommandLine;
+using TerevintoSoftware.StaticSiteGenerator.Tool;
 
-namespace TerevintoSoftware.StaticSiteGenerator.Tool;
+var rootCommand = StaticSiteGenerationOptionsBinder.BuildRootCommand();
 
-public class Program
-{
-    public static async Task<int> Main(string[] args)
-    {
-        var rootCommand = StaticSiteGenerationOptionsBinder.BuildRootCommand();
-
-        return await rootCommand.InvokeAsync(args);
-    }
-}
+return await rootCommand.InvokeAsync(args);

@@ -35,6 +35,11 @@ public class StaticSiteGenerationOptions
     public bool UseLocalization { get; }
 
     /// <summary>
+    /// Defines whether to clear the output folder or not.
+    /// </summary>
+    public bool ClearExistingOutput { get; }
+
+    /// <summary>
     /// Defines the default culture to use when rendering views.
     /// </summary>
     public string DefaultCulture { get; }
@@ -67,7 +72,7 @@ public class StaticSiteGenerationOptions
     /// <param name="useLocalization">Whether to enable localization for rendering views.</param>
     /// <param name="verbose">Whether to enable verbose logs.</param>
     public StaticSiteGenerationOptions(string projectPath, string outputPath, string relativeAssemblyPath, string baseController, 
-        string defaultRoutePattern, RouteCasing routeCasing, string? defaultCulture, bool useLocalization, bool verbose)
+        string defaultRoutePattern, RouteCasing routeCasing, string? defaultCulture, bool useLocalization, bool clearExistingOutput, bool verbose)
     {
         if (string.IsNullOrWhiteSpace(projectPath))
         {
@@ -92,6 +97,7 @@ public class StaticSiteGenerationOptions
         RouteCasing = routeCasing;
         DefaultCulture = defaultCulture ?? "en";
         UseLocalization = useLocalization;
+        ClearExistingOutput = clearExistingOutput;
         Verbose = verbose;
     }
 }

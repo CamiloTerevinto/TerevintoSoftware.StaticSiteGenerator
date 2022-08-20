@@ -8,7 +8,7 @@ namespace TerevintoSoftware.StaticSiteGenerator.Utilities;
 
 internal static class SiteAssemblyInformationFactory
 {
-    internal static SiteAssemblyInformation GetAssemblyInformation(IEnumerable<Type> exportedTypes, IEnumerable<Attribute> customAttributes, string defaultCulture)
+    internal static SiteAssemblyInformation BuildAssemblyInformation(IEnumerable<Type> exportedTypes, IEnumerable<Attribute> customAttributes, string defaultCulture)
     {
         var controllersNames = GetControllerNames(exportedTypes);
         var views = GetViewCultures(exportedTypes, customAttributes, defaultCulture);

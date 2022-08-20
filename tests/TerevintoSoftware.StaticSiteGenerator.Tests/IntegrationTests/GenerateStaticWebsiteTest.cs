@@ -16,9 +16,9 @@ public class GenerateStaticWebsiteTest
         var assemblyPath = AssemblyHelpers.GetDefaultRelativeAssemblyPath(projectPath);
 
         var options = new StaticSiteGenerationOptions(projectPath, outputPath, assemblyPath, "Home", 
-            "{controller=Home}/{action=Index}/{id?}", RouteCasing.LowerCase, "en", false, false);
+            "{controller=Home}/{action=Index}/{id?}", RouteCasing.LowerCase, "en", false, true, false);
 
-        var result = await StaticSiteBuilder.GenerateStaticSite(options);
+        var result = await StaticSiteBuilder.GenerateStaticSite(options, true);
         
         Assert.Multiple(() =>
         {

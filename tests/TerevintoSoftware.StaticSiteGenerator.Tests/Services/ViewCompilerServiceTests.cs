@@ -9,7 +9,7 @@ public class ViewCompilerServiceTests
 {
     private readonly Mock<IViewRenderService> _viewRenderServiceMock = new();
     private readonly Mock<IHtmlFormatter> _htmlFormatterMock = new();
-    private readonly StaticSiteGenerationOptions _staticSiteGenerationOptions = new("test", "test", "test", "Home", "", RouteCasing.LowerCase, "en", false, false);
+    private readonly StaticSiteGenerationOptions _staticSiteGenerationOptions = new("test", "test", "test", "Home", "", RouteCasing.LowerCase, "en", false, true, false);
 
     private ViewCompilerService _viewCompilerService;
 

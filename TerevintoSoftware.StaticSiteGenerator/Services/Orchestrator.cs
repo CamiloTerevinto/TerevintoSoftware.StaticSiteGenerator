@@ -1,4 +1,6 @@
-﻿using TerevintoSoftware.StaticSiteGenerator.Configuration;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using TerevintoSoftware.StaticSiteGenerator.Configuration;
 using TerevintoSoftware.StaticSiteGenerator.Models;
 using TerevintoSoftware.StaticSiteGenerator.Utilities;
 
@@ -9,23 +11,28 @@ internal class Orchestrator : IOrchestrator
     private readonly IViewCompilerService _viewCompilerService;
     private readonly StaticSiteGenerationOptions _staticSiteOptions;
     private readonly SiteAssemblyInformation _siteAssemblyInformation;
+    private readonly ILogger<Orchestrator> _logger;
 
-    public Orchestrator(IViewCompilerService viewCompilerService,
-        StaticSiteGenerationOptions staticSiteOptions, SiteAssemblyInformation siteAssemblyInformation)
+    public Orchestrator(IViewCompilerService viewCompilerService, StaticSiteGenerationOptions staticSiteOptions, 
+        SiteAssemblyInformation siteAssemblyInformation, ILogger<Orchestrator> logger)
     {
         _viewCompilerService = viewCompilerService;
         _staticSiteOptions = staticSiteOptions;
         _siteAssemblyInformation = siteAssemblyInformation;
+        _logger = logger;
     }
 
     public async Task<StaticSiteGenerationResult> BuildStaticFilesAsync()
     {
         var destination = _staticSiteOptions.OutputPath;
 
-        if (Directory.Exists(destination))
+        if (Directory.Exists(destination) && _staticSiteOptions.ClearExistingOutput)
         {
+            _logger.LogInformation("Deleting old output files");
             Directory.Delete(destination, true);
         }
+
+        _logger.LogInformation("Processing started...");
 
         Directory.CreateDirectory(destination);
 
@@ -36,7 +43,32 @@ internal class Orchestrator : IOrchestrator
 
         var (errors, views) = viewsTask.Result;
 
+        _logger.LogInformation("Processing completed.");
+
         return new StaticSiteGenerationResult(views, errors);
+    }
+
+    public void LogResults(StaticSiteGenerationResult result)
+    {
+        _logger.LogInformation("Generated {FilesCount} files:", result.ViewsCompiled.Count);
+
+        foreach (var view in result.ViewsCompiled)
+        {
+            _logger.LogInformation("{GeneratedView}", view);
+        }
+
+        if (result.Errors.Count > 0)
+        {
+            foreach (var error in result.Errors)
+            {
+                _logger.LogError("{Error}", error);
+            }
+
+            if (!_staticSiteOptions.Verbose)
+            {
+                _logger.LogInformation("Use --verbose to see detailed errors.");
+            }
+        }
     }
 
     private async Task<(List<string>, List<string>)> GenerateViewsAsync()
@@ -44,6 +76,8 @@ internal class Orchestrator : IOrchestrator
         var views = new List<string>();
         var errors = new List<string>();
 
+        _logger.LogInformation("Found {ViewCount} views to compile in {ControllerCount} controllers",
+            _siteAssemblyInformation.Views.Count, _siteAssemblyInformation.Controllers.Count);
         var viewsToGenerate = _siteAssemblyInformation.Views;
 
         var viewGenerationResults = await _viewCompilerService.CompileViews(viewsToGenerate);

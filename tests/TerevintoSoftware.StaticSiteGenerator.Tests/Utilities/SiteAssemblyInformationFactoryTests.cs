@@ -41,7 +41,7 @@ public class SiteAssemblyInformationFactoryTests
         var razorAttributes = _razorCompiledItemAttributes;
         var defaultCulture = "en";
 
-        var result = SiteAssemblyInformationFactory.GetAssemblyInformation(controllerTypes, razorAttributes, defaultCulture);
+        var result = SiteAssemblyInformationFactory.BuildAssemblyInformation(controllerTypes, razorAttributes, defaultCulture);
 
         var expectedHomeIndexCultures = new[] { "en", "es", "fr-FR" };
         
