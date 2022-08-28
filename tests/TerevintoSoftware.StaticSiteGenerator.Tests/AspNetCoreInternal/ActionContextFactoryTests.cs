@@ -15,7 +15,7 @@ internal class ActionContextFactoryTests
     {
         var factory = new ActionContextFactory(_serviceProvider.GetRequiredService<IServiceScopeFactory>(), _endpointProviderMock.Object);
 
-        var actionContext = factory.Create();
+        var actionContext = factory.Create("test", "test");
 
         Assert.That(actionContext, Is.InstanceOf<ActionContext>());
     }
