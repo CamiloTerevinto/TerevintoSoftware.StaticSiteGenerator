@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Options;
 using System.Globalization;
@@ -15,32 +16,35 @@ internal interface IViewRenderService
 
 internal class ViewRenderService : IViewRenderService
 {
-    private readonly MvcViewOptions _viewOptions;
     private readonly ITempDataProvider _tempDataProvider;
     private readonly IActionContextFactory _actionContextFactory;
     private readonly StaticSiteGenerationOptions _staticSiteGenerationOptions;
+    private readonly IViewEngine _viewEngine;
+    private readonly HtmlHelperOptions _htmlHelperOptions;
 
     public ViewRenderService(IOptions<MvcViewOptions> viewOptions, ITempDataProvider tempDataProvider,
         IActionContextFactory actionContextFactory, StaticSiteGenerationOptions staticSiteGenerationOptions)
     {
-        _viewOptions = viewOptions.Value;
         _tempDataProvider = tempDataProvider;
         _actionContextFactory = actionContextFactory;
         _staticSiteGenerationOptions = staticSiteGenerationOptions;
+        _viewEngine = viewOptions.Value.ViewEngines.First();
+        _htmlHelperOptions = viewOptions.Value.HtmlHelperOptions;
     }
 
     public async Task<string> GetCompiledView(string viewName, string? culture)
     {
-        var actionContext = _actionContextFactory.Create();
+        var splitted = viewName.Split('/');
+        var controllerName = splitted[0];
+        viewName = splitted[1];
+
+        var actionContext = _actionContextFactory.Create(controllerName, viewName);
 
         var cultureInfo = new CultureInfo(culture ?? _staticSiteGenerationOptions.DefaultCulture);
         Thread.CurrentThread.CurrentCulture = cultureInfo;
         Thread.CurrentThread.CurrentUICulture = cultureInfo;
 
-        var viewEngine = _viewOptions.ViewEngines.First();
-        var htmlHelperOptions = _viewOptions.HtmlHelperOptions;
-
-        var view = viewEngine.FindView(actionContext, viewName, true).View;
+        var view = _viewEngine.FindView(actionContext, viewName, true).View;
 
         if (view == null)
         {
@@ -56,7 +60,7 @@ internal class ViewRenderService : IViewRenderService
                 new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()),
                 new TempDataDictionary(actionContext.HttpContext, _tempDataProvider),
                 output,
-                htmlHelperOptions);
+                _htmlHelperOptions);
 
             await view.RenderAsync(viewContext);
         }

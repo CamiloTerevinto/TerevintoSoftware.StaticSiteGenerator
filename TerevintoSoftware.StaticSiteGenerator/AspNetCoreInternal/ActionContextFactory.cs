@@ -8,7 +8,7 @@ namespace TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
 
 internal interface IActionContextFactory
 {
-    ActionContext Create();
+    ActionContext Create(string controllerName, string viewName);
 }
 
 internal class ActionContextFactory : IActionContextFactory
@@ -22,7 +22,7 @@ internal class ActionContextFactory : IActionContextFactory
         _endpointProvider = endpointProvider;
     }
 
-    public ActionContext Create()
+    public ActionContext Create(string controllerName, string viewName)
     {
         var scope = _serviceScopeFactory.CreateScope();
         var httpContext = new DefaultHttpContext
@@ -32,6 +32,8 @@ internal class ActionContextFactory : IActionContextFactory
         httpContext.SetEndpoint(_endpointProvider.Endpoint);
 
         var routeData = httpContext.GetRouteData();
+        routeData.Values.Add("controller", controllerName);
+        routeData.Values.Add("action", viewName);
 
         return new ActionContext(httpContext, routeData, new ActionDescriptor());
     }
