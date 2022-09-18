@@ -13,7 +13,10 @@ internal class StringExtensionTests
     }
 
     [TestCase("HelloWorld", "hello-world")]
+    [TestCase("HElloWorld", "h-ello-world")]
+    [TestCase("Hello22World", "hello-22-world")]
     [TestCase("test", "test")]
+    [TestCase("test22", "test-22")]
     public void ToCasing_ShouldConvertAStringToKebabCase(string input, string output)
     {
         Assert.That(input.ToCasing(RouteCasing.KebabCase), Is.EqualTo(output));
