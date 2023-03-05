@@ -50,6 +50,7 @@ internal class ViewRenderService : IViewRenderService
         {
             throw new InvalidOperationException($"Unable to find view '{viewName}'");
         }
+
         var builder = new StringBuilder();
 
         using (var output = new StringWriter(builder))

@@ -28,8 +28,8 @@ internal static class StringExtensions
     /// <returns>The kebab-cased value.</returns>
     private static string ToKebabCase(string value)
     {
+        value = Regex.Replace(value, "([A-Z]?\\d+[a-z]*)", "-$1-");
         value = Regex.Replace(value, "([a-zA-Z])([A-Z])", "$1-$2").ToLower();
-        value = Regex.Replace(value, "(\\d+)", "-$1-");
 
         return value.TrimEnd('-');
     }
