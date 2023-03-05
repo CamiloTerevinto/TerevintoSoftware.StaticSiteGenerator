@@ -20,6 +20,9 @@ internal class StringExtensionTests
     [TestCase("test", "test")]
     [TestCase("test22", "test-22")]
     [TestCase("HelloW22orld", "hello-w22orld")]
+    [TestCase("A22Hours", "a-22-hours")]
+    [TestCase("22Hours", "22-hours")]
+    [TestCase("22hours", "22hours")]
     public void ToCasing_ShouldConvertAStringToKebabCase(string input, string output)
     {
         Assert.That(input.ToCasing(RouteCasing.KebabCase), Is.EqualTo(output));

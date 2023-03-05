@@ -28,9 +28,19 @@ internal static class StringExtensions
     /// <returns>The kebab-cased value.</returns>
     private static string ToKebabCase(string value)
     {
-        value = Regex.Replace(value, "([A-Z]?\\d+[a-z]*)", "-$1-");
-        value = Regex.Replace(value, "([a-zA-Z])([A-Z])", "$1-$2").ToLower();
+        // 1. Separate words that have numbers (i.e., B2c => -b2c-)
+        var replacedValue = Regex.Replace(value, "([A-Z]?\\d+[a-z]+)", "-$1-");
 
-        return value.TrimEnd('-');
+        if (replacedValue == value)
+        {
+            // 2. If the previous Regex didn't match, just split words by numbers (i.e., b2c => b-2-c).
+            replacedValue = Regex.Replace(value, "(\\d+)", "-$1-");
+        }
+
+        // 3. Separate SentenceCased words (i.e, HelloWorld => Hello-World)
+        replacedValue = Regex.Replace(replacedValue, "([a-zA-Z])([A-Z])", "$1-$2");
+
+        // 4. Remove a potential suffix/prefix '-'  from step 1 or 2, and convert the result to lowercase.
+        return replacedValue.Trim('-').ToLower();
     }
 }
