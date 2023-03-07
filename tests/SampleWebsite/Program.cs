@@ -1,24 +1,29 @@
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 [assembly:ExcludeFromCodeCoverage]
 
 var builder = WebApplication.CreateBuilder(args);
 
+var supportedLanguages = new[] { new CultureInfo("en"), new CultureInfo("es") };
+
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-}
 app.UseStaticFiles();
 
-app.UseRouting();
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(supportedLanguages[0]),
+    SupportedCultures = supportedLanguages,
+    SupportedUICultures = supportedLanguages
+});
 
-app.UseAuthorization();
+app.UseRouting();
 
 app.MapControllerRoute(
     name: "default",

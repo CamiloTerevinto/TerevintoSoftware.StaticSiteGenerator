@@ -30,8 +30,8 @@ public class ViewCompilerServiceTests
 
         _viewRenderServiceMock.Setup(x => x.GetCompiledView(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(() => "html");
         _htmlFormatterMock
-            .Setup(x => x.FixRelativeLinks(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-            .Returns((string html, string defaultCulture, string culture) => html);
+            .Setup(x => x.FixRelativeLinks(It.IsAny<string>(), It.IsAny<string>()))
+            .Returns((string html, string culture) => html);
 
         var result = await _viewCompilerService.CompileViews(viewsToRender);
 
@@ -73,8 +73,8 @@ public class ViewCompilerServiceTests
 
         _viewRenderServiceMock.Setup(x => x.GetCompiledView(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(() => "html");
         _htmlFormatterMock
-            .Setup(x => x.FixRelativeLinks(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-            .Returns((string html, string defaultCulture, string culture) => html);
+            .Setup(x => x.FixRelativeLinks(It.IsAny<string>(), It.IsAny<string>()))
+            .Returns((string html, string culture) => html);
 
         var result = await _viewCompilerService.CompileViews(viewsToRender);
 

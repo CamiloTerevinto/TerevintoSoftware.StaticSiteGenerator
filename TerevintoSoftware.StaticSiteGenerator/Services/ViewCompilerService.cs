@@ -44,7 +44,7 @@ internal class ViewCompilerService : IViewCompilerService
             {
                 var html = await _viewRenderService.GetCompiledView(viewName, currentCulture);
 
-                html = _htmlFormatter.FixRelativeLinks(html, _staticSiteGenerationOptions.DefaultCulture, currentCulture);
+                html = _htmlFormatter.FixRelativeLinks(html, currentCulture);
 
                 bag.Add(new ViewGenerationResult(viewName, new GeneratedView(viewNameWithoutCulture + ".html", html, currentCulture)));
             }

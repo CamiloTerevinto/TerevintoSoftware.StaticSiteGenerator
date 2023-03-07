@@ -52,7 +52,6 @@ internal class Startup
                 .AddSingleton(_staticSiteOptions)
                 .AddSingleton(siteAssemblyInformation)
                 .AddSingleton<IHtmlFormatter, HtmlFormatter>()
-                .AddSingleton<IUrlFormatter, UrlFormatter>()
                 .AddSingleton<IViewCompilerService, ViewCompilerService>()
                 .AddSingleton<IViewRenderService, ViewRenderService>()
                 .AddSingleton<IActionContextFactory, ActionContextFactory>()
