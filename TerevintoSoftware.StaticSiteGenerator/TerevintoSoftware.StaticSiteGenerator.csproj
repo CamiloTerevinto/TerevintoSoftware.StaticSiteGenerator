@@ -12,7 +12,7 @@
 		<RepositoryUrl>https://github.com/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator</RepositoryUrl>
 		<Description>A package for creating Static Websites (HTML+CSS+JavaScript) from ASP.NET Core MVC views.
 Read the README in the GitHub project for information on usage.  </Description>
-		<PackageIconUrl>https://www.camiloterevinto.com/assets/_nuget.png</PackageIconUrl>
+		<PackageIcon>icon.png</PackageIcon>
 		<PackageReleaseNotes> [1.4.1]: Minor improvements.
 [1.4.0]: Re-work culture-based link generation.
 [1.3.5]: Delete accidentally pushed code.
@@ -38,6 +38,7 @@ Read the README in the GitHub project for information on usage.  </Description>
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
+		<None Include="..\icon.png" Pack="true" PackagePath="\"/>
 	</ItemGroup>
 
 	<ItemGroup>
