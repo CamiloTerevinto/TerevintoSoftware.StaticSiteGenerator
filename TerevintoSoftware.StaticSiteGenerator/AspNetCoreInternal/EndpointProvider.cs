@@ -30,13 +30,13 @@ internal class EndpointProvider : IEndpointProvider, IAsyncDisposable
     public Endpoint Endpoint { get; }
     public IEndpointAddressScheme<RouteValuesAddress> EndpointAddressScheme { get; }
 
-    public EndpointProvider(StaticSiteGenerationOptions siteGenerationOptions)
+    public EndpointProvider(StaticSiteGenerationOptions siteGenerationOptions, Assembly baseAssembly)
     {
         _siteGenerationOptions = siteGenerationOptions;
-        (Endpoint, EndpointAddressScheme) = Initialize();
+        (Endpoint, EndpointAddressScheme) = Initialize(baseAssembly);
     }
 
-    private (Endpoint, IEndpointAddressScheme<RouteValuesAddress>) Initialize()
+    private (Endpoint, IEndpointAddressScheme<RouteValuesAddress>) Initialize(Assembly baseAssembly)
     {
         // NOTE: I create a new web application here as I could not think of a better way of replacing the EndpointAddressScheme
         // from the IServiceProvider, which means we need the built app and the app being built at the same time.
@@ -46,7 +46,7 @@ internal class EndpointProvider : IEndpointProvider, IAsyncDisposable
         var builder = WebApplication.CreateBuilder();
         builder.Services
             .AddControllersWithViews()
-            .AddApplicationPart(Assembly.LoadFrom(_siteGenerationOptions.AssemblyPath));
+            .AddApplicationPart(baseAssembly);
 
         builder.Services.AddLogging(c =>
         {
@@ -76,7 +76,8 @@ internal class EndpointProvider : IEndpointProvider, IAsyncDisposable
     }
 
     /// <summary>
-    /// Replaces the default instance of RouteValuesAddressScheme with <see cref="EndpointAddressScheme"/>.
+    /// Replaces the default instance of RouteValuesAddressScheme on the main application 
+    /// with <see cref="EndpointAddressScheme"/> built from the referenced application.
     /// </summary>
     /// <param name="services"></param>
     internal void Inject(IServiceCollection services)

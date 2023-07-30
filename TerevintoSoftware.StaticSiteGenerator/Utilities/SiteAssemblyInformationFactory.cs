@@ -10,15 +10,16 @@ internal static class SiteAssemblyInformationFactory
 {
     internal static SiteAssemblyInformation BuildAssemblyInformation(IEnumerable<Type> exportedTypes, IEnumerable<Attribute> customAttributes, string defaultCulture)
     {
-        var controllersNames = GetControllerNames(exportedTypes);
-        var views = GetViewCultures(exportedTypes, customAttributes, defaultCulture);
+        var controllerTypes = FindControllerTypes(exportedTypes).ToArray();
+        var controllersNames = GetControllerNames(controllerTypes);
+        var views = GetViewCultures(controllerTypes, customAttributes, defaultCulture);
 
         return new SiteAssemblyInformation(controllersNames, views);
     }
 
-    private static IReadOnlyCollection<CultureBasedView> GetViewCultures(IEnumerable<Type> exportedTypes, IEnumerable<Attribute> customAttributes, string defaultCulture)
+    private static IReadOnlyCollection<CultureBasedView> GetViewCultures(IEnumerable<Type> controllerTypes, IEnumerable<Attribute> customAttributes, string defaultCulture)
     {
-        var views = FindViews(exportedTypes, customAttributes);
+        var views = FindViews(controllerTypes, customAttributes);
 
         return views.Select(viewName =>
         {
@@ -38,10 +39,9 @@ internal static class SiteAssemblyInformationFactory
             .ToArray();
     }
 
-    private static IReadOnlyCollection<string> GetControllerNames(IEnumerable<Type> exportedTypes)
+    private static IReadOnlyCollection<string> GetControllerNames(IEnumerable<Type> controllerTypes)
     {
-        return FindControllerTypes(exportedTypes)
-            .Select(x =>
+        return controllerTypes.Select(x =>
             {
                 if (x.Name.EndsWith("Controller"))
                 {
@@ -60,10 +60,10 @@ internal static class SiteAssemblyInformationFactory
         return exportedTypes.Where(x => controllerBaseType.IsAssignableFrom(x));
     }
 
-    private static IEnumerable<string> FindViews(IEnumerable<Type> exportedTypes, IEnumerable<Attribute> customAttributes)
+    private static IEnumerable<string> FindViews(IEnumerable<Type> controllerTypes, IEnumerable<Attribute> customAttributes)
     {
         var nonModelViewBaseType = typeof(RazorPage<object>);
-        var actionRoutes = GetActionRoutes(exportedTypes);
+        var actionRoutes = GetActionRoutes(controllerTypes);
 
         return customAttributes
             .OfType<RazorCompiledItemAttribute>()
@@ -77,9 +77,9 @@ internal static class SiteAssemblyInformationFactory
                     return false;
                 }
 
-                return actionRoutes.Any(v =>
+                return actionRoutes.Any(actionRoute =>
                 {
-                    var viewPath = $"/Views/{v}";
+                    var viewPath = $"/Views/{actionRoute}";
                     var viewFilename = $"{viewPath}.cshtml";
 
                     if (viewFilename.Equals(x.Identifier, StringComparison.CurrentCultureIgnoreCase))
@@ -113,12 +113,19 @@ internal static class SiteAssemblyInformationFactory
             .ToArray();
     }
 
-    private static string[] GetActionRoutes(IEnumerable<Type> exportedTypes)
+    private static string[] GetActionRoutes(IEnumerable<Type> controllerTypes)
     {
-        return FindControllerTypes(exportedTypes)
+        var validReturnTypes = new HashSet<Type>(new[]
+        {
+            typeof(IActionResult),
+            typeof(ActionResult),
+            typeof(ViewResult)
+        });
+
+        return controllerTypes
             .SelectMany(controllerType => controllerType
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(method => method.ReturnType == typeof(IActionResult))
+                .Where(method => validReturnTypes.Contains(method.ReturnType))
                 .Select(method =>
                 {
                     var controllerName = controllerType.Name;
@@ -139,8 +146,6 @@ internal static class SiteAssemblyInformationFactory
                     }
 
                     // Otherwise, use the controller's and the action's name.
-
-
                     var action = method.Name;
 
                     return $"{controller}/{action}";

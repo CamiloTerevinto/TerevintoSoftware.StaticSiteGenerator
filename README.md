@@ -18,12 +18,9 @@ This project is divided in two packages:
 
 ## Sample usage
 
-1. Install the tool: `dotnet tool install TerevintoSoftware.StaticSiteGenerator.Tool`
-2. (optional) Create a new project: `dotnet new mvc -o MyProject`
-3. (optional) See the available options with `ssg -h`
-4. Run the static site generation: `ssg --project [project-path] --output [output-path]`
+SSG.NET has its own website that lists the different features here: https://www.staticsitegenerator.net/.
 
-The main website for testing out the basic set of features in this tool is [here](https://ctssgdemo.z16.web.core.windows.net/index.html).
+There is also a sample GitHub repository that shows how to use the tool for a Blog: https://github.com/CamiloTerevinto/StaticBlogTemplate.
 
 ## How to build
 
@@ -38,11 +35,12 @@ Once the solution is compiled, tests can be run either from Visual Studio's Test
 
 ## License
 
-The .NET Tool and this solution are licensed under the [MIT license](/LICENSE).
+This project is licensed under the [MIT license](/LICENSE).
 
 ## Bug reports and feature requests
 
-Please use the [issue tracker](https://github.com/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator/issues) and ensure your question/feedback was not previously reported.
+Please use the [issue tracker](3) and ensure your question/feedback was not previously reported.
 
 [1]: https://www.nuget.org/packages/TerevintoSoftware.StaticSiteGenerator/
 [2]: https://www.nuget.org/packages/TerevintoSoftware.StaticSiteGenerator.Tool/
+[3]: https://github.com/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator/issues

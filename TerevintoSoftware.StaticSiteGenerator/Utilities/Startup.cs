@@ -44,7 +44,7 @@ internal class Startup
 
             SetUpGlobalization(_staticSiteOptions, siteAssemblyInformation);
 
-            var endpointProvider = new EndpointProvider(_staticSiteOptions);
+            var endpointProvider = new EndpointProvider(_staticSiteOptions, assembly);
             endpointProvider.Inject(_builder.Services);
 
             _builder.Services
