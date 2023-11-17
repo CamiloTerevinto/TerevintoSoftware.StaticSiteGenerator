@@ -46,11 +46,11 @@ internal class ViewCompilerService : IViewCompilerService
 
                 html = _htmlFormatter.FixRelativeLinks(html, currentCulture);
 
-                bag.Add(new ViewGenerationResult(viewName, new GeneratedView(viewNameWithoutCulture + ".html", html, currentCulture)));
+                bag.Add(new ViewGenerationResult(viewName, currentCulture, new GeneratedView(viewNameWithoutCulture + ".html", html)));
             }
             catch (Exception ex)
             {
-                bag.Add(new ViewGenerationResult(viewName, ex.Message));
+                bag.Add(new ViewGenerationResult(viewName, currentCulture, ex.Message));
             }
 #if DEBUG           
         }

@@ -6,21 +6,21 @@
 public class StaticSiteGenerationResult
 {
     /// <summary>
-    /// Gets the list of views that were compiled into HTML.
+    /// The list of views that were compiled into HTML.
     /// </summary>
-    public IReadOnlyCollection<string> ViewsCompiled { get; }
+    public IReadOnlyCollection<ViewResult> ViewsResults { get; }
 
     /// <summary>
-    /// Gets the list of non-fatal errors that occurred during the generation.
+    /// Returns false if at least one view generation failed.
     /// </summary>
-    public IReadOnlyCollection<string> Errors { get; }
+    public bool Success { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StaticSiteGenerationResult"/> class.
     /// </summary>
-    public StaticSiteGenerationResult(IReadOnlyCollection<string> views, IReadOnlyCollection<string> errors)
+    public StaticSiteGenerationResult(IReadOnlyCollection<ViewResult> views, bool success)
     {
-        ViewsCompiled = views;
-        Errors = errors;
+        ViewsResults = views;
+        Success = success;
     }
 }

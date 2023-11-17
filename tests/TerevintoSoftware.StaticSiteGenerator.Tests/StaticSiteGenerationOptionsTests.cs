@@ -75,25 +75,6 @@ public class StaticSiteGenerationOptionsTests
     }
 
     [Test]
-    public void AssemblyPath_ShouldBeComputedWithProjectPathAndRelativeAssemblyPath()
-    {
-        var projectPath = "test";
-        var outputPath = "test";
-        var relativeAssemblyPath = "test";
-        var baseController = "Home";
-        var defaultRoutePattern = "{controller}/{action}/{id?}";
-        var routeCasing = RouteCasing.LowerCase;
-        var defaultCulture = "en";
-        bool useLocalization = false;
-        var clearExistingOutput = true;
-        bool verbose = false;
-
-        var options = new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, clearExistingOutput, verbose);
-
-        Assert.That(options.AssemblyPath, Is.EqualTo(Path.Combine(projectPath, relativeAssemblyPath)));
-    }
-
-    [Test]
     public void Constructor_ShouldAssignAllProperties()
     {
         var projectPath = "test";
@@ -113,7 +94,7 @@ public class StaticSiteGenerationOptionsTests
         {
             Assert.That(options.ProjectPath, Is.EqualTo(projectPath));
             Assert.That(options.OutputPath, Is.EqualTo(outputPath));
-            Assert.That(options.RelativeAssemblyPath, Is.EqualTo(relativeAssemblyPath));
+            Assert.That(options.AssemblyPath, Is.EqualTo(relativeAssemblyPath));
             Assert.That(options.BaseController, Is.EqualTo(baseController));
             Assert.That(options.DefaultRoutePattern, Is.EqualTo(defaultRoutePattern));
             Assert.That(options.RouteCasing, Is.EqualTo(routeCasing));

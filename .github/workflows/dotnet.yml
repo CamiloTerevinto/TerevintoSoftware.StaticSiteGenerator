@@ -8,31 +8,31 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: '8.0.x'
     
     - name: Build
       run: dotnet build
     
     - name: Run automated unit tests
-      run: dotnet test tests/TerevintoSoftware.StaticSiteGenerator.Tests/TerevintoSoftware.StaticSiteGenerator.Tests.csproj  /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
+      run: dotnet test tests/TerevintoSoftware.StaticSiteGenerator.Tests/TerevintoSoftware.StaticSiteGenerator.Tests.csproj /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --no-build
     
-    - name: Publish coverage report to coveralls.io   
-      uses: coverallsapp/github-action@master   
+    - name: Publish coverage report to coveralls.io
+      uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: tests/TerevintoSoftware.StaticSiteGenerator.Tests/TestResults/coverage.info 
+        path-to-lcov: tests/TerevintoSoftware.StaticSiteGenerator.Tests/TestResults/coverage.net8.0.info 
     
     - name: Package
-      run: dotnet pack -o ./packaged --no-build
-    
+      run: dotnet pack -o ./packaged
+      
     - name: Publish packages
+      if: ${{ github.ref == 'refs/heads/main' }}
       run: for i in ./packaged/* ; do dotnet nuget push $i -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate ; done 

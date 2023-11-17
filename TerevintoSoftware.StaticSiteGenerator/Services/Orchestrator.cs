@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Spectre.Console;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
 using TerevintoSoftware.StaticSiteGenerator.Models;
 using TerevintoSoftware.StaticSiteGenerator.Utilities;
@@ -11,28 +10,26 @@ internal class Orchestrator : IOrchestrator
     private readonly IViewCompilerService _viewCompilerService;
     private readonly StaticSiteGenerationOptions _staticSiteOptions;
     private readonly SiteAssemblyInformation _siteAssemblyInformation;
-    private readonly ILogger<Orchestrator> _logger;
 
-    public Orchestrator(IViewCompilerService viewCompilerService, StaticSiteGenerationOptions staticSiteOptions, 
-        SiteAssemblyInformation siteAssemblyInformation, ILogger<Orchestrator> logger)
+    public Orchestrator(IViewCompilerService viewCompilerService, StaticSiteGenerationOptions staticSiteOptions,
+        SiteAssemblyInformation siteAssemblyInformation)
     {
         _viewCompilerService = viewCompilerService;
         _staticSiteOptions = staticSiteOptions;
         _siteAssemblyInformation = siteAssemblyInformation;
-        _logger = logger;
     }
 
     public async Task<StaticSiteGenerationResult> BuildStaticFilesAsync()
     {
+        AnsiConsole.MarkupLine("Processing started...");
+        
         var destination = _staticSiteOptions.OutputPath;
 
         if (Directory.Exists(destination) && _staticSiteOptions.ClearExistingOutput)
         {
-            _logger.LogInformation("Deleting old output files");
+            AnsiConsole.MarkupLine("[bold]Deleting old output files[/]");
             Directory.Delete(destination, true);
         }
-
-        _logger.LogInformation("Processing started...");
 
         Directory.CreateDirectory(destination);
 
@@ -41,62 +38,58 @@ internal class Orchestrator : IOrchestrator
 
         await Task.WhenAll(viewsTask, assetsTask);
 
-        var (errors, views) = viewsTask.Result;
+        var (viewResults, success) = viewsTask.Result;
 
-        _logger.LogInformation("Processing completed.");
+        AnsiConsole.MarkupLine("Processing completed.");
 
-        return new StaticSiteGenerationResult(views, errors);
+        return new StaticSiteGenerationResult(viewResults, success);
     }
 
     public void LogResults(StaticSiteGenerationResult result)
     {
-        _logger.LogInformation("Generated {FilesCount} files:", result.ViewsCompiled.Count);
-
-        foreach (var view in result.ViewsCompiled)
+        foreach (var view in result.ViewsResults)
         {
-            _logger.LogInformation("{GeneratedView}", view);
-        }
-
-        if (result.Errors.Count > 0)
-        {
-            foreach (var error in result.Errors)
-            {
-                _logger.LogError("{Error}", error);
-            }
-
-            if (!_staticSiteOptions.Verbose)
-            {
-                _logger.LogInformation("Use --verbose to see detailed errors.");
-            }
+            AnsiConsole.MarkupLine("{0} results: {1} generated, {2} failed to generate.", view.ViewName, 
+                view.Results.Count(x => x.GeneratedView != null), view.Results.Count(x => x.Error != null));
         }
     }
 
-    private async Task<(List<string>, List<string>)> GenerateViewsAsync()
+    private async Task<(List<ViewResult>, bool)> GenerateViewsAsync()
     {
-        var views = new List<string>();
-        var errors = new List<string>();
+        var result = new List<ViewResult>();
+        var success = true;
 
-        _logger.LogInformation("Found {ViewCount} views to compile in {ControllerCount} controllers",
-            _siteAssemblyInformation.Views.Count, _siteAssemblyInformation.Controllers.Count);
+        AnsiConsole.MarkupLine("Found {0} views to compile in {1} controllers", _siteAssemblyInformation.Views.Count, _siteAssemblyInformation.Controllers.Count);
         var viewsToGenerate = _siteAssemblyInformation.Views;
 
         var viewGenerationResults = await _viewCompilerService.CompileViews(viewsToGenerate);
-        var baseControllerPath = $"{_staticSiteOptions.BaseController.ToLower()}/";
+        var baseControllerPath = $"{_staticSiteOptions.BaseController.ToLower()}{Path.DirectorySeparatorChar}";
+
+        var tempResult = new Dictionary<string, List<ViewCultureResult>>();
 
         foreach (var generationResult in viewGenerationResults)
         {
+            var nonCulturedViewName = generationResult.OriginalViewName;
+
+            if (nonCulturedViewName.Contains('.'))
+            {
+                nonCulturedViewName = nonCulturedViewName[..nonCulturedViewName.IndexOf('.')];
+            }
+
+            if (!tempResult.ContainsKey(nonCulturedViewName))
+            {
+                tempResult.Add(nonCulturedViewName, new());
+            }
+
             if (generationResult.Failed)
             {
-                errors.Add($"View {generationResult.OriginalViewName} => {generationResult.ErrorMessage!}");
+                tempResult[nonCulturedViewName].Add(new(generationResult.Culture, generationResult.ErrorMessage!, null!));
+                success = false;
                 continue;
             }
 
             var staticViewPath = GetNewViewPath(baseControllerPath, generationResult);
-
-            if (!Directory.Exists(Path.GetDirectoryName(staticViewPath)))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(staticViewPath)!);
-            }
+            Directory.CreateDirectory(Path.GetDirectoryName(staticViewPath)!);
 
             var view = generationResult.GeneratedView!;
 
@@ -104,32 +97,36 @@ internal class Orchestrator : IOrchestrator
 
             // If this is the main/default view and also the default language,
             // we copy the file again as just /index.html, so it can serve as an entry point
-            // for hosting providers that asks for an index.html at the root
+            // for hosting providers that ask for an index.html at the root
             if (_staticSiteOptions.UseLocalization &&
                 generationResult.OriginalViewName.ToLower() == $"{_staticSiteOptions.BaseController.ToLower()}/index" &&
-                view.Culture == _staticSiteOptions.DefaultCulture)
+                generationResult.Culture == _staticSiteOptions.DefaultCulture)
             {
                 File.WriteAllText(Path.Combine(_staticSiteOptions.OutputPath, Path.GetFileName(staticViewPath)), view.GeneratedHtml);
             }
 
-            views.Add($"View {generationResult.OriginalViewName} => {view.GeneratedName}");
+            tempResult[nonCulturedViewName].Add(new(generationResult.Culture, null!, staticViewPath));
         }
 
-        return (errors, views);
+        var finalResult = tempResult.Select(x => new ViewResult(x.Key, x.Value)).ToList();
+
+        return (finalResult, success);
     }
 
     private string GetNewViewPath(string baseControllerPath, ViewGenerationResult generationResult)
     {
-        var generatedName = generationResult.GeneratedView!.GeneratedName.ToCasing(_staticSiteOptions.RouteCasing);
+        var generatedName = generationResult.GeneratedView!.GeneratedName
+            .ToCasing(_staticSiteOptions.RouteCasing)
+            .Replace('/', Path.DirectorySeparatorChar);
 
         if (generatedName.StartsWith(baseControllerPath))
         {
             generatedName = generatedName[baseControllerPath.Length..];
         }
 
-        if (generationResult.GeneratedView.Culture != null && _staticSiteOptions.UseLocalization)
+        if (generationResult.Culture != null && _staticSiteOptions.UseLocalization)
         {
-            generatedName = $"{generationResult.GeneratedView.Culture}/{generatedName}";
+            generatedName = generationResult.Culture + Path.DirectorySeparatorChar + generatedName;
         }
 
         generationResult.GeneratedView = generationResult.GeneratedView with { GeneratedName = generatedName };
