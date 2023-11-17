@@ -17,7 +17,7 @@ public class StaticSiteGenerationOptions
     /// <summary>
     /// The relative path to the assembly containing the site's content.
     /// </summary>
-    public string RelativeAssemblyPath { get; }
+    public string AssemblyPath { get; }
 
     /// <summary>
     /// The name of the Base Controller (without the Controller suffix).
@@ -55,23 +55,18 @@ public class StaticSiteGenerationOptions
     public RouteCasing RouteCasing { get; }
 
     /// <summary>
-    /// The path to the assembly containing the site's content. 
-    /// </summary>
-    internal string AssemblyPath => Path.Combine(ProjectPath, RelativeAssemblyPath);
-
-    /// <summary>
     /// Creates an instance of <see cref="StaticSiteGenerationOptions"/>.
     /// </summary>
     /// <param name="projectPath">The path to the MVC project's directory.</param>
     /// <param name="outputPath">The path to store the output.</param>
-    /// <param name="relativeAssemblyPath">The path to the compiled assembly, if using a non-default path.</param>
+    /// <param name="assemblyPath">The path to the compiled assembly, if using a non-default path.</param>
     /// <param name="baseController">The name of the base Controller, where [Controller] is removed from the URL.</param>
     /// <param name="defaultRoutePattern">The default route pattern.</param>
     /// <param name="routeCasing">The casing convention to use for routes.</param>
     /// <param name="defaultCulture">The default culture to use for rendering views.</param>
     /// <param name="useLocalization">Whether to enable localization for rendering views.</param>
     /// <param name="verbose">Whether to enable verbose logs.</param>
-    public StaticSiteGenerationOptions(string projectPath, string outputPath, string relativeAssemblyPath, string baseController, 
+    public StaticSiteGenerationOptions(string projectPath, string outputPath, string assemblyPath, string baseController, 
         string defaultRoutePattern, RouteCasing routeCasing, string? defaultCulture, bool useLocalization, bool clearExistingOutput, bool verbose)
     {
         if (string.IsNullOrWhiteSpace(projectPath))
@@ -84,14 +79,14 @@ public class StaticSiteGenerationOptions
             throw new ArgumentNullException(nameof(outputPath));
         }
 
-        if (string.IsNullOrWhiteSpace(relativeAssemblyPath))
+        if (string.IsNullOrWhiteSpace(assemblyPath))
         {
-            throw new ArgumentNullException(nameof(relativeAssemblyPath));
+            throw new ArgumentNullException(nameof(assemblyPath));
         }
 
         ProjectPath = projectPath;
         OutputPath = outputPath;
-        RelativeAssemblyPath = relativeAssemblyPath;
+        AssemblyPath = assemblyPath;
         BaseController = baseController;
         DefaultRoutePattern = defaultRoutePattern;
         RouteCasing = routeCasing;

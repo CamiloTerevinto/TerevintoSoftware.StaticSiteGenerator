@@ -48,16 +48,6 @@ internal class EndpointProvider : IEndpointProvider, IAsyncDisposable
             .AddControllersWithViews()
             .AddApplicationPart(baseAssembly);
 
-        builder.Services.AddLogging(c =>
-        {
-            c.AddConsole();
-
-            if (_siteGenerationOptions.Verbose)
-            {
-                c.SetMinimumLevel(LogLevel.Debug);
-            }
-        });
-
         _app = builder.Build();
         _app.MapControllerRoute("default", _siteGenerationOptions.DefaultRoutePattern);
 

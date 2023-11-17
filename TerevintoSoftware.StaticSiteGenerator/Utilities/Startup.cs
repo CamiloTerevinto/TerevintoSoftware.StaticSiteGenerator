@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
@@ -28,7 +26,6 @@ internal class Startup
     {
         try
         {
-            SetUpLogging(_staticSiteOptions.Verbose);
             var assembly = Assembly.LoadFrom(_staticSiteOptions.AssemblyPath);
 
             var exportedTypes = assembly.GetExportedTypes();
@@ -68,24 +65,6 @@ internal class Startup
     internal WebApplication Build()
     {
         return _builder.Build();
-    }
-
-    private void SetUpLogging(bool enableVerboseLogs)
-    {
-        var listener = new DiagnosticListener("StaticSiteGenerator");
-        _builder.Services.AddSingleton<DiagnosticSource>(listener);
-        _builder.Services.AddSingleton(listener);
-        _builder.Services.AddLogging(c =>
-        {
-            c.AddConsole();
-
-            if (enableVerboseLogs)
-            {
-                c.SetMinimumLevel(LogLevel.Debug);
-            }
-
-            c.AddFilter("Microsoft.AspNetCore.DataProtection", LogLevel.Warning);
-        });
     }
 
     private void SetUpGlobalization(StaticSiteGenerationOptions staticSiteOptions, SiteAssemblyInformation siteAssemblyInformation)

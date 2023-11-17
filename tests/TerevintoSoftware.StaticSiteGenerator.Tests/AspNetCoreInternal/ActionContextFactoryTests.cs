@@ -8,7 +8,7 @@ namespace TerevintoSoftware.StaticSiteGenerator.Tests.AspNetCoreInternal;
 internal class ActionContextFactoryTests
 {
     private readonly Mock<IEndpointProvider> _endpointProviderMock = new();
-    private readonly IServiceProvider _serviceProvider = new ServiceCollection().BuildServiceProvider();
+    private readonly ServiceProvider _serviceProvider = new ServiceCollection().BuildServiceProvider();
 
     [Test]
     public void Create_ShouldCreateAnActionContext()
@@ -19,4 +19,6 @@ internal class ActionContextFactoryTests
 
         Assert.That(actionContext, Is.InstanceOf<ActionContext>());
     }
+
+    [OneTimeTearDown] public void TearDown() { _serviceProvider.Dispose(); }
 }

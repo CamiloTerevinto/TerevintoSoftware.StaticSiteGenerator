@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
+using TerevintoSoftware.StaticSiteGenerator.Utilities;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Tests.IntegrationTests;
 
@@ -10,11 +11,11 @@ public class GenerateStaticWebsiteTest
     public async Task GenerateStaticWebsite()
     {
         var testContext = TestContext.CurrentContext;
-        var testDirectory = new DirectoryInfo(testContext.TestDirectory); 
-        // net6.0 => Debug => bin => TerevintoSoftware.StaticSiteGenerator.Tests => tests ==> SampleWebsite
+        var testDirectory = new DirectoryInfo(testContext.TestDirectory);
+        // net6.0 | net7.0 | net8.0 => Debug => bin => TerevintoSoftware.StaticSiteGenerator.Tests => tests ==> SampleWebsite
         var projectPath = Path.Combine(testDirectory.Parent!.Parent!.Parent!.Parent!.ToString(), "SampleWebsite");
         var outputPath = Path.Combine(testContext.WorkDirectory, "SampleWebsiteOutput");
-        var assemblyPath = AssemblyHelpers.GetDefaultRelativeAssemblyPath(projectPath);
+        var assemblyPath = AssemblyHelpers.FindAssemblyPath(projectPath);
 
         var options = new StaticSiteGenerationOptions(projectPath, outputPath, assemblyPath, "Home", 
             "{controller=Home}/{action=Index}/{id?}", RouteCasing.LowerCase, "en", true, true, false);
@@ -23,12 +24,18 @@ public class GenerateStaticWebsiteTest
         
         Assert.Multiple(() =>
         {
-            Assert.That(result.Errors, Is.Empty);
-            Assert.That(result.ViewsCompiled, Has.Count.EqualTo(4));
-            Assert.That(result.ViewsCompiled.SingleOrDefault(x => x == "View Home/Index => en/index.html"), Is.Not.Null);
-            Assert.That(result.ViewsCompiled.SingleOrDefault(x => x == "View Home/Index.es => es/index.html"), Is.Not.Null);
-            Assert.That(result.ViewsCompiled.SingleOrDefault(x => x == "View Home/Privacy => en/privacy.html"), Is.Not.Null);
-            Assert.That(result.ViewsCompiled.SingleOrDefault(x => x == "View Home/Privacy.es => es/privacy.html"), Is.Not.Null);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.ViewsResults, Has.Count.EqualTo(2));
+
+            var indexViewResult = result.ViewsResults.Single(x => x.ViewName == "Home/Index");
+            Assert.That(indexViewResult.Results, Has.Count.EqualTo(2));
+            Assert.That(indexViewResult.Results.Single(x => x.Culture == "en").GeneratedView, Does.EndWith("en" + Path.DirectorySeparatorChar + "index.html"));
+            Assert.That(indexViewResult.Results.Single(x => x.Culture == "es").GeneratedView, Does.EndWith("es" + Path.DirectorySeparatorChar + "index.html"));
+
+            var privacyViewResult = result.ViewsResults.Single(x => x.ViewName == "Home/Privacy");
+            Assert.That(privacyViewResult.Results, Has.Count.EqualTo(2));
+            Assert.That(privacyViewResult.Results.Single(x => x.Culture == "en").GeneratedView, Does.EndWith("en" + Path.DirectorySeparatorChar + "privacy.html"));
+            Assert.That(privacyViewResult.Results.Single(x => x.Culture == "es").GeneratedView, Does.EndWith("es" + Path.DirectorySeparatorChar + "privacy.html"));
         });
 
         var expectedEnglishIndexPath = Path.Combine(outputPath, "index.html");
