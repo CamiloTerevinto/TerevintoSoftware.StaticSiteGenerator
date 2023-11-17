@@ -9,9 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet: [ '6.0.x', '7.0.x', '8.0.x' ]
 
     steps:
     - uses: actions/checkout@v3
@@ -19,7 +16,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: ${{ matrix.dotnet }}
+        dotnet-version: '8.0.x'
     
     - name: Build
       run: dotnet build
@@ -28,16 +25,13 @@ jobs:
       run: dotnet test tests/TerevintoSoftware.StaticSiteGenerator.Tests/TerevintoSoftware.StaticSiteGenerator.Tests.csproj  /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov   
     
     - name: Publish coverage report to coveralls.io
-      if: ${{ matrix.dotnet == '8.0.x' }}
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: tests/TerevintoSoftware.StaticSiteGenerator.Tests/TestResults/coverage.info 
     
     - name: Package
-      if: ${{ matrix.dotnet == '8.0.x' }}
       run: dotnet pack -o ./packaged --no-build
     
     - name: Publish packages
-      if: ${{ github.ref == 'refs/heads/main' && matrix.dotnet == '8.0.x' }}
       run: for i in ./packaged/* ; do dotnet nuget push $i -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate ; done 
