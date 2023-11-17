@@ -34,4 +34,5 @@ jobs:
       run: dotnet pack -o ./packaged --no-build
     
     - name: Publish packages
+      if: ${{ github.ref == 'refs/heads/main' }}
       run: for i in ./packaged/* ; do dotnet nuget push $i -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate ; done 
