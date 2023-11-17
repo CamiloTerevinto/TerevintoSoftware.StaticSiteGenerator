@@ -19,10 +19,10 @@ jobs:
         dotnet-version: '8.0.x'
     
     - name: Build
-      run: dotnet build -c Release
+      run: dotnet build
     
     - name: Run automated unit tests
-      run: dotnet test tests/TerevintoSoftware.StaticSiteGenerator.Tests/TerevintoSoftware.StaticSiteGenerator.Tests.csproj  /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --no-build
+      run: dotnet test tests/TerevintoSoftware.StaticSiteGenerator.Tests/TerevintoSoftware.StaticSiteGenerator.Tests.csproj /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --no-build
     
     - name: Publish coverage report to coveralls.io
       uses: coverallsapp/github-action@master
@@ -31,8 +31,8 @@ jobs:
         path-to-lcov: tests/TerevintoSoftware.StaticSiteGenerator.Tests/TestResults/coverage.net8.0.info 
     
     - name: Package
-      run: dotnet pack -o ./packaged --no-build
-    
+      run: dotnet pack -o ./packaged
+      
     - name: Publish packages
       if: ${{ github.ref == 'refs/heads/main' }}
       run: for i in ./packaged/* ; do dotnet nuget push $i -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate ; done 
