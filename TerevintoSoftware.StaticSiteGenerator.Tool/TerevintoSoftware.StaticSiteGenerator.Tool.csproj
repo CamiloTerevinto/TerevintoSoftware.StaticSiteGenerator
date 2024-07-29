@@ -2,17 +2,18 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>net6.0;net8.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Authors>Camilo Terevinto</Authors>
 		<PackageTags>asp.net core;static website</PackageTags>
-		<PackageProjectUrl>https://github.com/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator</PackageProjectUrl>
+		<PackageProjectUrl>https://staticsitegenerator.netlify.app</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator</RepositoryUrl>
 		<Description>A package for creating Static Websites (HTML+CSS+JavaScript) from ASP.NET Core MVC views.
 Read the README in the GitHub project for information on usage.		</Description>
 		<PackageIcon>icon.png</PackageIcon>
-		<PackageReleaseNotes>[2.0.0]: Add support for .NET 8 and move to Spectre.Console.
+		<PackageReleaseNotes>[2.1.0]: Remove support for deprecated .NET 7.
+[2.0.0]: Add support for .NET 8 and move to Spectre.Console.
 [1.4.1]: Minor improvements.
 [1.4.0]: Re-work culture-based link generation.
 [1.3.5]: Delete accidentally pushed code.
@@ -25,7 +26,7 @@ Read the README in the GitHub project for information on usage.		</Description>
 [1.2.1]: Internal re-archicture and improve code coverage to over 90%.
 [1.2.0]: Adds an initial implementation for path-based views based on culture.
 [1.1.1]: Fixes a URL generation bug for the default Controller actions. Previous versions were deprecated as unstable.</PackageReleaseNotes>
-		<Version>2.0.0</Version>
+		<Version>2.1.0</Version>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackAsTool>true</PackAsTool>
@@ -43,7 +44,7 @@ Read the README in the GitHub project for information on usage.		</Description>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Spectre.Console.Cli" Version="0.47.0" />
+	  <PackageReference Include="Spectre.Console.Cli" Version="0.49.1" />
 	</ItemGroup>
 
 	<ItemGroup>
