@@ -7,13 +7,14 @@ namespace TerevintoSoftware.StaticSiteGenerator.Tests.Services;
 [TestFixture]
 public class HtmlFormatterTests
 {
-    const string _singleLinkWrapper = "<html><body><a href=\"{0}\">link</a></body></html>";
+    private const string _singleLinkWrapper = "<html><body><a href=\"{0}\">link</a></body></html>";
+    private static readonly string[] _controllersFound = ["Home", "Blog"];
 
     [Test]
     public void EnsureHtmlIsUnmodifiedIfThereAreNoLinks()
     {
         StaticSiteGenerationOptions options = new("test", "test", "test", "Home", "", RouteCasing.LowerCase, "en", false, false, false);
-        SiteAssemblyInformation siteAssemblyInformation = new(new[] { "Home", "Blog" }, new CultureBasedView[] { new("Index", new[] { "en" }) });
+        SiteAssemblyInformation siteAssemblyInformation = new(_controllersFound, [new("Index", ["en"])]);
         HtmlFormatter formatter = new(siteAssemblyInformation, options);
 
         var inputHtml = "<html><body><a href=\"https://example.com\">link</a></body></html>";
@@ -35,7 +36,7 @@ public class HtmlFormatterTests
     public void FormatLowerCase_NoLocalization(string inputUrl, string expectedOutputUrl)
     {
         StaticSiteGenerationOptions options = new("test", "test", "test", "Home", "", RouteCasing.LowerCase, "en", false, false, false);
-        SiteAssemblyInformation siteAssemblyInformation = new(new[] { "Home", "Blog" }, new CultureBasedView[] { new("Index", new[] { "en" }) });
+        SiteAssemblyInformation siteAssemblyInformation = new(_controllersFound, new CultureBasedView[] { new("Index", ["en"]) });
         HtmlFormatter formatter = new(siteAssemblyInformation, options);
 
         var inputHtml = string.Format(_singleLinkWrapper, inputUrl);
@@ -57,7 +58,7 @@ public class HtmlFormatterTests
     public void FormatKebabCase_NoLocalization(string inputUrl, string expectedOutputUrl)
     {
         StaticSiteGenerationOptions options = new("test", "test", "test", "Home", "", RouteCasing.KebabCase, "en", false, false, false);
-        SiteAssemblyInformation siteAssemblyInformation = new(new[] { "Home", "Blog" }, new CultureBasedView[] { new("Index", new[] { "en" }) });
+        SiteAssemblyInformation siteAssemblyInformation = new(_controllersFound, new CultureBasedView[] { new("Index", ["en"]) });
         HtmlFormatter formatter = new(siteAssemblyInformation, options);
 
         var inputHtml = string.Format(_singleLinkWrapper, inputUrl);
@@ -79,7 +80,7 @@ public class HtmlFormatterTests
     public void FormatKeepOriginalCase_NoLocalization(string inputUrl, string expectedOutputUrl)
     {
         StaticSiteGenerationOptions options = new("test", "test", "test", "Home", "", RouteCasing.KeepOriginal, "en", false, false, false);
-        SiteAssemblyInformation siteAssemblyInformation = new(new[] { "Home", "Blog" }, new CultureBasedView[] { new("Index", new[] { "en" }) });
+        SiteAssemblyInformation siteAssemblyInformation = new(_controllersFound, new CultureBasedView[] { new("Index", ["en"]) });
         HtmlFormatter formatter = new(siteAssemblyInformation, options);
 
         var inputHtml = string.Format(_singleLinkWrapper, inputUrl);
@@ -101,7 +102,7 @@ public class HtmlFormatterTests
     public void FormatLowerCase_WithLocalization(string inputUrl, string expectedOutputUrl)
     {
         StaticSiteGenerationOptions options = new("test", "test", "test", "Home", "", RouteCasing.LowerCase, "en", true, false, false);
-        SiteAssemblyInformation siteAssemblyInformation = new(new[] { "Home", "Blog" }, new CultureBasedView[] { new("Index", new[] { "en", "es" }) });
+        SiteAssemblyInformation siteAssemblyInformation = new(_controllersFound, new CultureBasedView[] { new("Index", ["en", "es"]) });
         HtmlFormatter formatter = new(siteAssemblyInformation, options);
 
         var inputHtml = string.Format(_singleLinkWrapper, inputUrl);
@@ -123,7 +124,7 @@ public class HtmlFormatterTests
     public void FormatKebabCase_WithLocalization(string inputUrl, string expectedOutputUrl)
     {
         StaticSiteGenerationOptions options = new("test", "test", "test", "Home", "", RouteCasing.KebabCase, "en", true, false, false);
-        SiteAssemblyInformation siteAssemblyInformation = new(new[] { "Home", "Blog" }, new CultureBasedView[] { new("Index", new[] { "en", "es" }) });
+        SiteAssemblyInformation siteAssemblyInformation = new(_controllersFound, new CultureBasedView[] { new("Index", ["en", "es"]) });
         HtmlFormatter formatter = new(siteAssemblyInformation, options);
 
         var inputHtml = string.Format(_singleLinkWrapper, inputUrl);
@@ -145,7 +146,7 @@ public class HtmlFormatterTests
     public void FormatKeepOriginalCase_WithLocalization(string inputUrl, string expectedOutputUrl)
     {
         StaticSiteGenerationOptions options = new("test", "test", "test", "Home", "", RouteCasing.KeepOriginal, "en", true, false, false);
-        SiteAssemblyInformation siteAssemblyInformation = new(new[] { "Home", "Blog" }, new CultureBasedView[] { new("Index", new[] { "en", "es" }) });
+        SiteAssemblyInformation siteAssemblyInformation = new(_controllersFound, new CultureBasedView[] { new("Index", ["en", "es"]) });
         HtmlFormatter formatter = new(siteAssemblyInformation, options);
 
         var inputHtml = string.Format(_singleLinkWrapper, inputUrl);
@@ -167,7 +168,7 @@ public class HtmlFormatterTests
     public void FormatLowerCase_WithLocalization_DifferentLanguage(string inputUrl, string expectedOutputUrl)
     {
         StaticSiteGenerationOptions options = new("test", "test", "test", "Home", "", RouteCasing.LowerCase, "en", true, false, false);
-        SiteAssemblyInformation siteAssemblyInformation = new(new[] { "Home", "Blog" }, new CultureBasedView[] { new("Index", new[] { "en", "es" }) });
+        SiteAssemblyInformation siteAssemblyInformation = new(_controllersFound, new CultureBasedView[] { new("Index", ["en", "es"]) });
         HtmlFormatter formatter = new(siteAssemblyInformation, options);
 
         var inputHtml = string.Format(_singleLinkWrapper, inputUrl);
@@ -189,7 +190,7 @@ public class HtmlFormatterTests
     public void FormatKebabCase_WithLocalization_DifferentLanguage(string inputUrl, string expectedOutputUrl)
     {
         StaticSiteGenerationOptions options = new("test", "test", "test", "Home", "", RouteCasing.KebabCase, "en", true, false, false);
-        SiteAssemblyInformation siteAssemblyInformation = new(new[] { "Home", "Blog" }, new CultureBasedView[] { new("Index", new[] { "en", "es" }) });
+        SiteAssemblyInformation siteAssemblyInformation = new(_controllersFound, new CultureBasedView[] { new("Index", ["en", "es"]) });
         HtmlFormatter formatter = new(siteAssemblyInformation, options);
 
         var inputHtml = string.Format(_singleLinkWrapper, inputUrl);
@@ -211,7 +212,7 @@ public class HtmlFormatterTests
     public void FormatKeepOriginalCase_WithLocalization_DifferentLanguage(string inputUrl, string expectedOutputUrl)
     {
         StaticSiteGenerationOptions options = new("test", "test", "test", "Home", "", RouteCasing.KeepOriginal, "en", true, false, false);
-        SiteAssemblyInformation siteAssemblyInformation = new(new[] { "Home", "Blog" }, new CultureBasedView[] { new("Index", new[] { "en", "es" }) });
+        SiteAssemblyInformation siteAssemblyInformation = new(_controllersFound, new CultureBasedView[] { new("Index", ["en", "es"]) });
         HtmlFormatter formatter = new(siteAssemblyInformation, options);
 
         var inputHtml = string.Format(_singleLinkWrapper, inputUrl);

@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>net8.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Authors>Camilo Terevinto</Authors>
@@ -12,7 +12,8 @@
 		<Description>A package for creating Static Websites (HTML+CSS+JavaScript) from ASP.NET Core MVC views.
 Read the README in the GitHub project for information on usage.		</Description>
 		<PackageIcon>icon.png</PackageIcon>
-		<PackageReleaseNotes>[2.1.0]: Remove support for deprecated .NET 7.
+		<PackageReleaseNotes>[2.2.0]: Remove support for .NET 6, update packages, and use newer code constructs.
+[2.1.0]: Remove support for deprecated .NET 7.
 [2.0.0]: Add support for .NET 8 and move to Spectre.Console.
 [1.4.1]: Minor improvements.
 [1.4.0]: Re-work culture-based link generation.
@@ -26,7 +27,7 @@ Read the README in the GitHub project for information on usage.		</Description>
 [1.2.1]: Internal re-archicture and improve code coverage to over 90%.
 [1.2.0]: Adds an initial implementation for path-based views based on culture.
 [1.1.1]: Fixes a URL generation bug for the default Controller actions. Previous versions were deprecated as unstable.</PackageReleaseNotes>
-		<Version>2.1.0</Version>
+		<Version>2.2.0</Version>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackAsTool>true</PackAsTool>
@@ -44,7 +45,7 @@ Read the README in the GitHub project for information on usage.		</Description>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Spectre.Console.Cli" Version="0.49.1" />
+	  <PackageReference Include="Spectre.Console.Cli" Version="0.50.0" />
 	</ItemGroup>
 
 	<ItemGroup>

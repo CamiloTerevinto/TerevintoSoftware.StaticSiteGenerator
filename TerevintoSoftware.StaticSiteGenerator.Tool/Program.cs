@@ -1,4 +1,4 @@
-﻿using Spectre.Console.Cli;
+using Spectre.Console.Cli;
 using TerevintoSoftware.StaticSiteGenerator.Tool;
 
 var app = new CommandApp();
@@ -7,7 +7,7 @@ app.Configure(configurator =>
 {
     configurator
         .SetApplicationName("ssg")
-        .SetApplicationVersion("2.0.0");
+        .SetApplicationVersion("2.2.0");
 
     configurator.AddCommand<GenerateCommand>("generate")
         .WithDescription(

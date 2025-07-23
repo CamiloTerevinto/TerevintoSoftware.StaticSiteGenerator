@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
 using TerevintoSoftware.StaticSiteGenerator.Services;
@@ -24,8 +24,8 @@ public class ViewCompilerServiceTests
     {
         var viewsToRender = new List<CultureBasedView>
         {
-            new CultureBasedView("Home/Index", new[] { "en" }),
-            new CultureBasedView("Home/Blog", new[] { "en" }),
+            new("Home/Index", ["en"]),
+            new("Home/Blog", ["en"])
         };
 
         _viewRenderServiceMock.Setup(x => x.GetCompiledView(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(() => "html");
@@ -35,11 +35,11 @@ public class ViewCompilerServiceTests
 
         var result = await _viewCompilerService.CompileViews(viewsToRender);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result.Count(), Is.EqualTo(viewsToRender.Count));
-            Assert.That(result.Any(x => x.Failed), Is.EqualTo(false));
-        });
+            Assert.That(result.Any(x => x.Failed), Is.False);
+        }
     }
 
     [Test]
@@ -47,19 +47,19 @@ public class ViewCompilerServiceTests
     {
         var viewsToRender = new List<CultureBasedView>
         {
-            new CultureBasedView("Home/Index", new[] { "en" }),
-            new CultureBasedView("Home/Blog", new[] { "en" }),
+            new("Home/Index", ["en"]),
+            new("Home/Blog", ["en"])
         };
 
         _viewRenderServiceMock.Setup(x => x.GetCompiledView(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(new Exception("test"));
 
         var result = await _viewCompilerService.CompileViews(viewsToRender);
-
-        Assert.Multiple(() =>
+        
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result.Count(), Is.EqualTo(viewsToRender.Count));
-            Assert.That(result.Any(x => x.Failed), Is.EqualTo(true));
-        });
+            Assert.That(result.Any(x => x.Failed), Is.True);
+        }
     }
 
     [Test]
@@ -67,8 +67,8 @@ public class ViewCompilerServiceTests
     {
         var viewsToRender = new List<CultureBasedView>
         {
-            new CultureBasedView("Home/Index", new[] { "en" }),
-            new CultureBasedView("Home/Blog", new[] { "es" }),
+            new("Home/Index", ["en"]),
+            new("Home/Blog", ["es"])
         };
 
         _viewRenderServiceMock.Setup(x => x.GetCompiledView(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(() => "html");
@@ -80,11 +80,11 @@ public class ViewCompilerServiceTests
 
         var firstView = result.First(x => x.OriginalViewName.StartsWith("Home/Index"));
         var secondView = result.First(x => x.OriginalViewName.StartsWith("Home/Blog"));
-
-        Assert.Multiple(() =>
+        
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(firstView.OriginalViewName, Is.EqualTo("Home/Index"));
             Assert.That(secondView.OriginalViewName, Is.EqualTo("Home/Blog.es"));
-        });
+        }
     }
 }

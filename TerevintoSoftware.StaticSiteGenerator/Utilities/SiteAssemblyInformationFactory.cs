@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Razor.Hosting;
 using System.Reflection;
@@ -17,7 +17,7 @@ internal static class SiteAssemblyInformationFactory
         return new SiteAssemblyInformation(controllersNames, views);
     }
 
-    private static IReadOnlyCollection<CultureBasedView> GetViewCultures(IEnumerable<Type> controllerTypes, IEnumerable<Attribute> customAttributes, string defaultCulture)
+    private static CultureBasedView[] GetViewCultures(IEnumerable<Type> controllerTypes, IEnumerable<Attribute> customAttributes, string defaultCulture)
     {
         var views = FindViews(controllerTypes, customAttributes);
 
@@ -39,7 +39,7 @@ internal static class SiteAssemblyInformationFactory
             .ToArray();
     }
 
-    private static IReadOnlyCollection<string> GetControllerNames(IEnumerable<Type> controllerTypes)
+    private static string[] GetControllerNames(IEnumerable<Type> controllerTypes)
     {
         return controllerTypes.Select(x =>
             {
@@ -60,7 +60,7 @@ internal static class SiteAssemblyInformationFactory
         return exportedTypes.Where(x => controllerBaseType.IsAssignableFrom(x));
     }
 
-    private static IEnumerable<string> FindViews(IEnumerable<Type> controllerTypes, IEnumerable<Attribute> customAttributes)
+    private static string[] FindViews(IEnumerable<Type> controllerTypes, IEnumerable<Attribute> customAttributes)
     {
         var nonModelViewBaseType = typeof(RazorPage<object>);
         var actionRoutes = GetActionRoutes(controllerTypes);
@@ -137,7 +137,7 @@ internal static class SiteAssemblyInformationFactory
                     // If the action has a templated route, use that.
                     if (!string.IsNullOrEmpty(template))
                     {
-                        if (template.StartsWith("/", StringComparison.Ordinal))
+                        if (template.StartsWith('/'))
                         {
                             return template[1..];
                         }

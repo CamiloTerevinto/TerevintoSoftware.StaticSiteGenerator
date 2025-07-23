@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Routing;
@@ -11,16 +11,10 @@ internal interface IActionContextFactory
     ActionContext Create(string controllerName, string viewName);
 }
 
-internal class ActionContextFactory : IActionContextFactory
+internal class ActionContextFactory(IServiceScopeFactory serviceScopeFactory, IEndpointProvider endpointProvider) : IActionContextFactory
 {
-    private readonly IServiceScopeFactory _serviceScopeFactory;
-    private readonly IEndpointProvider _endpointProvider;
-
-    public ActionContextFactory(IServiceScopeFactory serviceScopeFactory, IEndpointProvider endpointProvider)
-    {
-        _serviceScopeFactory = serviceScopeFactory;
-        _endpointProvider = endpointProvider;
-    }
+    private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
+    private readonly IEndpointProvider _endpointProvider = endpointProvider;
 
     public ActionContext Create(string controllerName, string viewName)
     {

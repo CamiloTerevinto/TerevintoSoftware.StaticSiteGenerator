@@ -1,4 +1,4 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
 using TerevintoSoftware.StaticSiteGenerator.Utilities;
 
@@ -9,16 +9,10 @@ internal interface IHtmlFormatter
     string FixRelativeLinks(string html, string currentCulture);
 }
 
-internal class HtmlFormatter : IHtmlFormatter
+internal class HtmlFormatter(SiteAssemblyInformation siteAssemblyInformation, StaticSiteGenerationOptions staticSiteGenerationOptions) : IHtmlFormatter
 {
-    private readonly SiteAssemblyInformation _siteAssemblyInformation;
-    private readonly StaticSiteGenerationOptions _staticSiteGenerationOptions;
-
-    public HtmlFormatter(SiteAssemblyInformation siteAssemblyInformation, StaticSiteGenerationOptions staticSiteGenerationOptions)
-    {
-        _staticSiteGenerationOptions = staticSiteGenerationOptions;
-        _siteAssemblyInformation = siteAssemblyInformation;
-    }
+    private readonly SiteAssemblyInformation _siteAssemblyInformation = siteAssemblyInformation;
+    private readonly StaticSiteGenerationOptions _staticSiteGenerationOptions = staticSiteGenerationOptions;
 
     public string FixRelativeLinks(string html, string currentCulture)
     {

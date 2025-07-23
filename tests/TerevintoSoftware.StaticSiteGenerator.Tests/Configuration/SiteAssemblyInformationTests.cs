@@ -1,4 +1,4 @@
-﻿using TerevintoSoftware.StaticSiteGenerator.Configuration;
+using TerevintoSoftware.StaticSiteGenerator.Configuration;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Tests.Configuration;
 
@@ -29,11 +29,11 @@ public class SiteAssemblyInformationTests
         var controllers = new List<string>();
 
         var siteAssemblyInformation = new SiteAssemblyInformation(controllers, views);
-        
-        Assert.Multiple(() =>
+
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(siteAssemblyInformation.Controllers, Is.EqualTo(controllers));
             Assert.That(siteAssemblyInformation.Views, Is.EqualTo(views));
-        });
+        }
     }
 }

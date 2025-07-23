@@ -40,7 +40,7 @@ public class AssemblyHelpersTests
         var testContext = TestContext.CurrentContext;
         var testDirectory = new DirectoryInfo(testContext.TestDirectory);
 
-        // net6.0 | net8.0 => Debug => bin => TerevintoSoftware.StaticSiteGenerator.Tests => tests ==> SampleWebsite
+        // net8.0 => Debug => bin => TerevintoSoftware.StaticSiteGenerator.Tests => tests ==> SampleWebsite
         return Path.Combine(testDirectory.Parent!.Parent!.Parent!.Parent!.ToString(), "SampleWebsite");
     }
 }

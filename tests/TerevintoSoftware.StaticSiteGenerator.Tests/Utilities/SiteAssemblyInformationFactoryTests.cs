@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Razor.Hosting;
 using System.Diagnostics.CodeAnalysis;
-using TerevintoSoftware.StaticSiteGenerator.Configuration;
 using TerevintoSoftware.StaticSiteGenerator.Utilities;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Tests.Utilities;
@@ -45,11 +44,11 @@ public class SiteAssemblyInformationFactoryTests
 
         var expectedHomeIndexCultures = new[] { "en", "es", "fr-FR" };
         
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result.Controllers, Has.Count.EqualTo(2));
             Assert.That(result.Views, Has.Count.EqualTo(6));
             Assert.That(result.Views.Any(x => x.ViewName == "Home/Index" && x.Cultures.SequenceEqual(expectedHomeIndexCultures)), Is.True);
-        });
+        }
     }
 }

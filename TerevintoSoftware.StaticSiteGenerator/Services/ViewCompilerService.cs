@@ -1,23 +1,21 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
 using TerevintoSoftware.StaticSiteGenerator.Models;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Services;
 
-internal class ViewCompilerService : IViewCompilerService
+internal interface IViewCompilerService
 {
-    private readonly IViewRenderService _viewRenderService;
-    private readonly StaticSiteGenerationOptions _staticSiteGenerationOptions;
-    private readonly IHtmlFormatter _htmlFormatter;
+    Task<IEnumerable<ViewGenerationResult>> CompileViews(IEnumerable<CultureBasedView> viewsToRender);
+}
 
-    public ViewCompilerService(IViewRenderService viewRenderService, IHtmlFormatter htmlFormatter,
-        StaticSiteGenerationOptions staticSiteGenerationOptions)
-    {
-        _viewRenderService = viewRenderService;
-        _staticSiteGenerationOptions = staticSiteGenerationOptions;
-        _htmlFormatter = htmlFormatter;
-    }
+internal class ViewCompilerService(IViewRenderService viewRenderService, IHtmlFormatter htmlFormatter,
+    StaticSiteGenerationOptions staticSiteGenerationOptions) : IViewCompilerService
+{
+    private readonly IViewRenderService _viewRenderService = viewRenderService;
+    private readonly StaticSiteGenerationOptions _staticSiteGenerationOptions = staticSiteGenerationOptions;
+    private readonly IHtmlFormatter _htmlFormatter = htmlFormatter;
 
     public async Task<IEnumerable<ViewGenerationResult>> CompileViews(IEnumerable<CultureBasedView> viewsToRender)
     {

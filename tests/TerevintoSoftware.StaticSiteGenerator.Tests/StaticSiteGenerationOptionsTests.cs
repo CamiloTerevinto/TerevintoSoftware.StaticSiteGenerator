@@ -1,4 +1,4 @@
-﻿using TerevintoSoftware.StaticSiteGenerator.Configuration;
+using TerevintoSoftware.StaticSiteGenerator.Configuration;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Tests;
 
@@ -89,8 +89,8 @@ public class StaticSiteGenerationOptionsTests
         bool verbose = false;
 
         var options = new StaticSiteGenerationOptions(projectPath, outputPath, relativeAssemblyPath, baseController, defaultRoutePattern, routeCasing, defaultCulture, useLocalization, clearExistingOutput, verbose);
-        
-        Assert.Multiple(() =>
+
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(options.ProjectPath, Is.EqualTo(projectPath));
             Assert.That(options.OutputPath, Is.EqualTo(outputPath));
@@ -102,6 +102,6 @@ public class StaticSiteGenerationOptionsTests
             Assert.That(options.UseLocalization, Is.EqualTo(useLocalization));
             Assert.That(options.Verbose, Is.EqualTo(verbose));
             Assert.That(options.ClearExistingOutput, Is.EqualTo(clearExistingOutput));
-        });
+        }
     }
 }

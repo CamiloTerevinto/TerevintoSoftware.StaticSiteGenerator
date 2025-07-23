@@ -1,9 +1,9 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Utilities;
 
-internal static class StringExtensions
+internal static partial class StringExtensions
 {
     /// <summary>
     /// Changes the casing of a string according to the specified format.
@@ -29,18 +29,27 @@ internal static class StringExtensions
     private static string ToKebabCase(string value)
     {
         // 1. Separate words that have numbers (i.e., B2c => -b2c-)
-        var replacedValue = Regex.Replace(value, "([A-Z]?\\d+[a-z]+)", "-$1-");
+        var replacedValue = SeparateWordsWithNumbersRegex().Replace(value, "-$1-");
 
         if (replacedValue == value)
         {
             // 2. If the previous Regex didn't match, just split words by numbers (i.e., b2c => b-2-c).
-            replacedValue = Regex.Replace(value, "(\\d+)", "-$1-");
+            replacedValue = SplitWordsByNumbersRegex().Replace(value, "-$1-");
         }
 
         // 3. Separate SentenceCased words (i.e, HelloWorld => Hello-World)
-        replacedValue = Regex.Replace(replacedValue, "([a-zA-Z])([A-Z])", "$1-$2");
+        replacedValue = SeparateWordsByCasingRegex().Replace(replacedValue, "$1-$2");
 
         // 4. Remove a potential suffix/prefix '-'  from step 1 or 2, and convert the result to lowercase.
         return replacedValue.Trim('-').ToLower();
     }
+
+    [GeneratedRegex("([A-Z]?\\d+[a-z]+)")]
+    private static partial Regex SeparateWordsWithNumbersRegex();
+
+    [GeneratedRegex("(\\d+)")]
+    private static partial Regex SplitWordsByNumbersRegex();
+
+    [GeneratedRegex("([a-zA-Z])([A-Z])")]
+    private static partial Regex SeparateWordsByCasingRegex();
 }

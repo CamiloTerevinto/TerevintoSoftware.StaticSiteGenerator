@@ -1,23 +1,22 @@
-﻿using Spectre.Console;
+using Spectre.Console;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
 using TerevintoSoftware.StaticSiteGenerator.Models;
 using TerevintoSoftware.StaticSiteGenerator.Utilities;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Services;
 
-internal class Orchestrator : IOrchestrator
+internal interface IOrchestrator
 {
-    private readonly IViewCompilerService _viewCompilerService;
-    private readonly StaticSiteGenerationOptions _staticSiteOptions;
-    private readonly SiteAssemblyInformation _siteAssemblyInformation;
+    Task<StaticSiteGenerationResult> BuildStaticFilesAsync();
+    void LogResults(StaticSiteGenerationResult result);
+}
 
-    public Orchestrator(IViewCompilerService viewCompilerService, StaticSiteGenerationOptions staticSiteOptions,
-        SiteAssemblyInformation siteAssemblyInformation)
-    {
-        _viewCompilerService = viewCompilerService;
-        _staticSiteOptions = staticSiteOptions;
-        _siteAssemblyInformation = siteAssemblyInformation;
-    }
+internal class Orchestrator(IViewCompilerService viewCompilerService, StaticSiteGenerationOptions staticSiteOptions,
+    SiteAssemblyInformation siteAssemblyInformation) : IOrchestrator
+{
+    private readonly IViewCompilerService _viewCompilerService = viewCompilerService;
+    private readonly StaticSiteGenerationOptions _staticSiteOptions = staticSiteOptions;
+    private readonly SiteAssemblyInformation _siteAssemblyInformation = siteAssemblyInformation;
 
     public async Task<StaticSiteGenerationResult> BuildStaticFilesAsync()
     {
@@ -76,14 +75,15 @@ internal class Orchestrator : IOrchestrator
                 nonCulturedViewName = nonCulturedViewName[..nonCulturedViewName.IndexOf('.')];
             }
 
-            if (!tempResult.ContainsKey(nonCulturedViewName))
+            if (!tempResult.TryGetValue(nonCulturedViewName, out var nonCulturedView))
             {
-                tempResult.Add(nonCulturedViewName, new());
+                nonCulturedView = new();
+                tempResult.Add(nonCulturedViewName, nonCulturedView);
             }
 
             if (generationResult.Failed)
             {
-                tempResult[nonCulturedViewName].Add(new(generationResult.Culture, generationResult.ErrorMessage!, null!));
+                nonCulturedView.Add(new(generationResult.Culture, generationResult.ErrorMessage!, null!));
                 success = false;
                 continue;
             }
@@ -99,13 +99,13 @@ internal class Orchestrator : IOrchestrator
             // we copy the file again as just /index.html, so it can serve as an entry point
             // for hosting providers that ask for an index.html at the root
             if (_staticSiteOptions.UseLocalization &&
-                generationResult.OriginalViewName.ToLower() == $"{_staticSiteOptions.BaseController.ToLower()}/index" &&
+                generationResult.OriginalViewName.Equals($"{_staticSiteOptions.BaseController.ToLower()}/index", StringComparison.CurrentCultureIgnoreCase) &&
                 generationResult.Culture == _staticSiteOptions.DefaultCulture)
             {
                 File.WriteAllText(Path.Combine(_staticSiteOptions.OutputPath, Path.GetFileName(staticViewPath)), view.GeneratedHtml);
             }
 
-            tempResult[nonCulturedViewName].Add(new(generationResult.Culture, null!, staticViewPath));
+            nonCulturedView.Add(new(generationResult.Culture, null!, staticViewPath));
         }
 
         var finalResult = tempResult.Select(x => new ViewResult(x.Key, x.Value)).ToList();
