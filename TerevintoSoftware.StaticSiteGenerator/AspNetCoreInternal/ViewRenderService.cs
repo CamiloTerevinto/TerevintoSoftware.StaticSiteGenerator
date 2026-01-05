@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Options;
 using System.Globalization;
 using System.Text;
+using TerevintoSoftware.StaticSiteGenerator.Models;
 
 namespace TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
 

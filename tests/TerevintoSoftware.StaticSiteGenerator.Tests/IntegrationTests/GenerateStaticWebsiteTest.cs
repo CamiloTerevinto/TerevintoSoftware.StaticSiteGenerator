@@ -1,5 +1,6 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
+using TerevintoSoftware.StaticSiteGenerator.Models;
 using TerevintoSoftware.StaticSiteGenerator.Utilities;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Tests.IntegrationTests;

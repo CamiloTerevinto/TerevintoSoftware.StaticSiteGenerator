@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
+using TerevintoSoftware.StaticSiteGenerator.Models;
 using TerevintoSoftware.StaticSiteGenerator.Services;
 using TerevintoSoftware.StaticSiteGenerator.Utilities;
 

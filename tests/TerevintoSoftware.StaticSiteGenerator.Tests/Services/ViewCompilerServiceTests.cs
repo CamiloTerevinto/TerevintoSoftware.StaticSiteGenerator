@@ -1,6 +1,7 @@
 using Moq;
 using TerevintoSoftware.StaticSiteGenerator.AspNetCoreInternal;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
+using TerevintoSoftware.StaticSiteGenerator.Models;
 using TerevintoSoftware.StaticSiteGenerator.Services;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Tests.Services;

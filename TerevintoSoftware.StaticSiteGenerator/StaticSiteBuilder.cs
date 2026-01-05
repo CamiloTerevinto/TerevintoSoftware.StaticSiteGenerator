@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using TerevintoSoftware.StaticSiteGenerator.Models;
 using TerevintoSoftware.StaticSiteGenerator.Services;
 
@@ -15,10 +15,7 @@ public static class StaticSiteBuilder
     /// <exception cref="ArgumentNullException">When staticSiteOptions is null.</exception>
     public static async Task<StaticSiteGenerationResult> GenerateStaticSite(StaticSiteGenerationOptions staticSiteOptions, bool writeOutputLogs)
     {
-        if (staticSiteOptions == null)
-        {
-            throw new ArgumentNullException(nameof(staticSiteOptions));
-        }
+        ArgumentNullException.ThrowIfNull(staticSiteOptions);
 
         await using var app = new Startup(staticSiteOptions)
             .ConfigureServices()

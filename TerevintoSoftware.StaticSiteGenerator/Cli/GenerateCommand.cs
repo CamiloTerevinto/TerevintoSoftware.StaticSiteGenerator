@@ -1,11 +1,12 @@
-﻿using Spectre.Console;
+using Spectre.Console;
 using Spectre.Console.Cli;
+using TerevintoSoftware.StaticSiteGenerator.Models;
 
-namespace TerevintoSoftware.StaticSiteGenerator.Tool;
+namespace TerevintoSoftware.StaticSiteGenerator.Cli;
 
 internal class GenerateCommand : AsyncCommand<GenerateSettings>
 {
-    public override async Task<int> ExecuteAsync(CommandContext context, GenerateSettings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, GenerateSettings settings, CancellationToken cancellationToken)
     {
         try
         {

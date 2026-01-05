@@ -1,6 +1,6 @@
-﻿using TerevintoSoftware.StaticSiteGenerator.Configuration;
+using TerevintoSoftware.StaticSiteGenerator.Configuration;
 
-namespace TerevintoSoftware.StaticSiteGenerator;
+namespace TerevintoSoftware.StaticSiteGenerator.Models;
 
 public class StaticSiteGenerationOptions
 {

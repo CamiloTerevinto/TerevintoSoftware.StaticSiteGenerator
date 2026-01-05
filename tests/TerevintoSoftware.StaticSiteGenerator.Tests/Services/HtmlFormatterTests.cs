@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
+using TerevintoSoftware.StaticSiteGenerator.Models;
 using TerevintoSoftware.StaticSiteGenerator.Services;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Tests.Services;

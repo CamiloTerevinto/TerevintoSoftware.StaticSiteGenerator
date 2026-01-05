@@ -1,10 +1,10 @@
-﻿using Spectre.Console;
+using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
 using TerevintoSoftware.StaticSiteGenerator.Utilities;
 
-namespace TerevintoSoftware.StaticSiteGenerator.Tool;
+namespace TerevintoSoftware.StaticSiteGenerator.Cli;
 
 internal class GenerateSettings : CommandSettings
 {

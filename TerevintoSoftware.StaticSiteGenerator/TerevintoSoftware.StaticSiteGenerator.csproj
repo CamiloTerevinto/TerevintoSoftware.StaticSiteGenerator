@@ -1,38 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0</TargetFrameworks>
+		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<IsPackable>true</IsPackable>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Authors>Camilo Terevinto</Authors>
-		<PackageTags>asp.net core;static website</PackageTags>
-		<PackageProjectUrl>https://staticsitegenerator.netlify.app</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator</RepositoryUrl>
-		<Description>A package for creating Static Websites (HTML+CSS+JavaScript) from ASP.NET Core MVC views.
-Read the README in the GitHub project for information on usage.  </Description>
-		<PackageIcon>icon.png</PackageIcon>
-		<PackageReleaseNotes>[2.2.0]: Remove support for .NET 6, update packages, and use newer code constructs.
-[2.1.0]: Remove support for deprecated .NET 7.
-[2.0.0]: Add support for .NET 8 and move to Spectre.Console.
-[1.4.1]: Minor improvements.
-[1.4.0]: Re-work culture-based link generation.
-[1.3.5]: Delete accidentally pushed code.
-[1.3.4]: Further improvements to word separation in the generation of kebab-cased URLs.
-[1.3.3]: Improves URL generation for kebab-cased URLs.
-[1.3.2]: Improves URL generation for kebab-cased URLs.
-[1.3.1]: Improves view rendering so that views/components/partials can be found in the same folder as views being rendered.
-[1.3.0]: Add a new option to skip deleting existing output. Makes the view generation run inside the project's folder.
-[1.2.2]: Fixes an issue where a single culture always generated structures/links as if there were multiple cultures.
-[1.2.1]: Internal re-archicture and improve code coverage to over 90%.
-[1.2.0]: Adds an initial implementation for path-based views based on culture.
-[1.1.1]: Fixes a URL generation bug for the default Controller actions. Previous versions were deprecated as unstable.</PackageReleaseNotes>
-		<Version>2.2.0</Version>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<Copyright>Camilo Terevinto</Copyright>
-	</PropertyGroup>
+        <Authors>Camilo Terevinto</Authors>
+        <PackageTags>asp.net core;static website</PackageTags>
+        <PackageProjectUrl>https://staticsitegenerator.netlify.app</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/CamiloTerevinto/TerevintoSoftware.StaticSiteGenerator</RepositoryUrl>
+        <Description>
+            A package for creating Static Websites (HTML+CSS+JavaScript) from ASP.NET Core MVC views.
+            Read the README in the GitHub project for information on usage.
+        </Description>
+        <PackageIcon>icon.png</PackageIcon>
+        <Version>10.0.0</Version>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Copyright>Camilo Terevinto</Copyright>
+        <IsPackable>true</IsPackable>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <PackageOutputPath>Packaged</PackageOutputPath>
+        <PackAsTool>true</PackAsTool>
+        <OutputType>Exe</OutputType>
+        <ToolCommandName>ssg</ToolCommandName>
+    </PropertyGroup>
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="TerevintoSoftware.StaticSiteGenerator.Tests" />
@@ -49,9 +40,10 @@ Read the README in the GitHub project for information on usage.  </Description>
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.18" Condition="'$(TargetFramework)' == 'net8.0'" />
-		<PackageReference Include="Spectre.Console" Version="0.50.0" />
-	</ItemGroup>
+		<PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="[10.0.0,11.0.0)" />
+		<PackageReference Include="Spectre.Console" Version="0.54.0" />
+        <PackageReference Include="Spectre.Console.Cli" Version="0.53.1" />
+    </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
-﻿using System.Globalization;
+using System.Globalization;
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
+using TerevintoSoftware.StaticSiteGenerator.Models;
 using TerevintoSoftware.StaticSiteGenerator.Utilities;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Tests.Utilities;

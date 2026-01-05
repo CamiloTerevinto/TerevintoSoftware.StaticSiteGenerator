@@ -1,4 +1,5 @@
 using TerevintoSoftware.StaticSiteGenerator.Configuration;
+using TerevintoSoftware.StaticSiteGenerator.Models;
 
 namespace TerevintoSoftware.StaticSiteGenerator.Tests;
 
