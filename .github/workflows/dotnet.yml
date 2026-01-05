@@ -19,7 +19,7 @@ jobs:
         dotnet-version: '10.0.x'
     
     - name: Build
-      run: dotnet build
+      run: dotnet build -c Release
     
     - name: Run automated unit tests
       run: dotnet test tests/TerevintoSoftware.StaticSiteGenerator.Tests/TerevintoSoftware.StaticSiteGenerator.Tests.csproj /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --no-build
@@ -31,7 +31,7 @@ jobs:
         path-to-lcov: tests/TerevintoSoftware.StaticSiteGenerator.Tests/TestResults/coverage.info 
     
     - name: Package
-      run: dotnet pack -o ./packaged
+      run: dotnet pack TerevintoSoftware.StaticSiteGenerator/TerevintoSoftware.StaticSiteGenerator.csproj -o ./packaged --no-build
       
     - name: Publish packages
       if: ${{ github.ref == 'refs/heads/main' }}
