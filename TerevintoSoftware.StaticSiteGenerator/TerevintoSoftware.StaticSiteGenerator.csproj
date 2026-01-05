@@ -13,7 +13,7 @@
             Read the README in the GitHub project for information on usage.
         </Description>
         <PackageIcon>icon.png</PackageIcon>
-        <Version>10.0.0</Version>
+        <Version>10.0.1</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Copyright>Camilo Terevinto</Copyright>

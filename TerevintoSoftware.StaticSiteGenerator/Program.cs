@@ -7,7 +7,7 @@ app.Configure(configurator =>
 {
     configurator
         .SetApplicationName("ssg")
-        .SetApplicationVersion("10.0.0");
+        .SetApplicationVersion("10.0.1");
 
     configurator.AddCommand<GenerateCommand>("generate")
         .WithDescription(
