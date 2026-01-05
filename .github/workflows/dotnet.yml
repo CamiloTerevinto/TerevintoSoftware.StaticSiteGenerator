@@ -28,7 +28,7 @@ jobs:
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: tests/TerevintoSoftware.StaticSiteGenerator.Tests/TestResults/coverage.net10.0.info 
+        path-to-lcov: tests/TerevintoSoftware.StaticSiteGenerator.Tests/TestResults/coverage.info 
     
     - name: Package
       run: dotnet pack -o ./packaged
